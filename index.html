@@ -1,0 +1,28 @@
+<script src="//connect.soundcloud.com/sdk-2.0.0.js"></script>
+<script type="text/javascript" src="soundmanager/script/soundmanager2.js"></script>
+<script type="text/javascript">
+
+	SC.initialize({
+      client_id: '9896695e978359ad6e39e1b98f22abb4'
+    });
+
+	soundManager.setup({
+		flashVersion: 9, // optional: shiny features (default = 8)
+		preferFlash: false,
+		onready: function() {
+			var mySound = soundManager.createSound({
+				id: 'CurrentSound', // optional: provide your own unique id
+				url: 'https://api.soundcloud.com/tracks/83077847'
+				autoLoad: true,
+  				autoPlay: true
+		    });
+
+		    //mySound.play();
+		}
+	});
+</script>
+
+<body>
+	<h1>Soundmanager Test</h1>
+</body>
+

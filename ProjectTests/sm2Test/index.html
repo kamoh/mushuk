@@ -1,0 +1,53 @@
+<script src="//connect.soundcloud.com/sdk-2.0.0.js"></script>
+<script type="text/javascript" src="soundmanager/script/soundmanager2.js"></script>
+<script type="text/javascript">
+
+    var cid     = '9896695e978359ad6e39e1b98f22abb4';
+    var ready   = false;
+    var track_url;
+
+    SC.initialize({
+      client_id: cid
+    });
+
+    soundManager.setup({
+        flashVersion: 9, // optional: shiny features (default = 8)
+        preferFlash: false,
+        onready: function() {
+            ready       = true; //I'm assuming soundManager just has a ready property.
+            track_url   = 'https://soundcloud.com/hadouken/hadouken-bliss-out-1';
+        }
+    });
+
+    function Play(){
+        soundManager.stop('currentSound')
+        track_url = document.getElementById("url").value;
+        
+        SC.get('/resolve', { url: track_url }, function(track) {
+            var art = track.artwork_url;
+            art = art.replace("-large", '-crop');
+            document.getElementById("album_art").src = art;
+            document.getElementById("song_name").innerHTML = track.title;
+            document.getElementById("user_name").innerHTML = track.user.username;
+
+            soundManager.createSound({
+                id: "currentSound", // optional: provide your own unique id
+                url: track.stream_url + '?client_id=' + cid,
+                autoLoad: true,
+                autoPlay: true
+            });
+
+        });
+    }
+</script>
+
+<body>
+    <h1>Soundmanager Test</h1>
+    <img id="album_art" src="http://gfm.fm/assets/img/default-albumart.png" alt="Album Art" style="border: 5px solid grey"/>
+    <h3 id="song_name">Song</h3>
+    <h4 id="user_name">Artist</h4>
+    <input type="text" name="url" id="url"/>
+    <button onclick="Play()">Get Song!</button>
+    <button onclick="soundManager.stop('currentSound')">Stop Current Song</button>
+    <button onclick="soundManager.play('currentSound')">Play Current Song</button>
+</body>
