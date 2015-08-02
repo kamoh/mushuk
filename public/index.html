@@ -47,16 +47,28 @@
         <script type="text/javascript">
 
             //Socket Stuff/////////////////////////////////////////////////
-            var socket = io.connect('http://mushuk.herokuapp.com');
+            var socket = io.connect('http://mushuk.herokuapp.com'),
+            noNames = ["goober","monkeybat","moosejamms","grumpkin","derf-pooper","roosta","sounddrooper","tacobreath","lolwut","uncle jemima","front-door farter","carseat","air conditioner","lint roller","butterscotch krumpet","tuba repairman","pocket salesman","car door inspector","used gum aficionado","k-pop fanatic","beer ombudsman","big bird impersonator","graffiti stain","wisdom tooth","ignorance tooth","pocket harmonica", "dumb butt"],
+            defaultName = noNames[Math.floor(Math.random() * noNames.length)] + Math.floor(Math.random(1,9999)*1000);
 
             socket.on('connect_success', function (data) {
                 console.log("Connect Success!");
                 console.log(data);
-                var setName = prompt("Please enter your name", "DumbButt");
+
+                queue = data.room.queue;
+
+                if(data.room.isPlaying){
+                    StartTrack(queue[0],data.pos);
+                }
+
+                var setName = prompt("Please enter your name", defaultName);
+                if(setName == null){
+                    setName = defaultName;
+                }
                 socket.emit('set_name', { name: setName });
 
                 socket.on('user_left', function (data) {
-                console.log(data.name + " left!");
+                    console.log(data.name + " left!");
                 });
 
                 socket.on('user_joined', function (data) {
@@ -64,17 +76,12 @@
                 });
 
                 socket.on('queue_update', function (data) {
-                    var autoPlay=false;
-                    if(queue.length==0){
-                        autoPlay=true;
-                    }
-
                     queue = data.queue;
                     UpdateQueueElements();
+                });
 
-                    if(autoPlay){
-                        StartTrack(queue[0]);
-                    }
+                socket.on('start_next_song', function () {
+                    StartTrack(queue[0],0);
                 });
             });
             ///////////////////////////////////////////////////////////////
@@ -99,7 +106,8 @@
                 }
             });
 
-            function StartTrack(track){
+            function StartTrack(track,pos){
+
                 soundManager.stop('currentSound');
                 soundManager.destroySound("currentSound");
                 var art;
@@ -123,20 +131,25 @@
                     multiShotEvents: false,
                     whileplaying: function() {
                             document.getElementById('song_progress').value = this.position/this.duration;
-                    },
-                    onfinish: function(){StartNextTrack();}
+                    }
                 });
 
-                $("#play_button").attr('class','glyphicon glyphicon-pause');
+                if(pos!=null){
+                    currentSound.position = pos;
+                }
+
+                //onfinish: function(){StartNextTrack();}
+
+                //$("#play_button").attr('class','glyphicon glyphicon-pause');
             }
 
             function TogglePlay(){
                 currentSound.togglePause();
                 if(currentSound.paused){
-                    $("#play_button").attr('class','glyphicon glyphicon-play');
+                   // $("#play_button").attr('class','glyphicon glyphicon-play');
                 }
                 else{
-                    $("#play_button").attr('class','glyphicon glyphicon-pause');
+                    //$("#play_button").attr('class','glyphicon glyphicon-pause');
                 }
             }
 
@@ -144,11 +157,15 @@
                 socket.emit('add_to_queue', { track: track});
             }
 
+            function RequestNextTrack(){
+                socket.emit('request_next_track');
+            }
+
             function StartNextTrack(){
                 if(queue.length>1){
                     queue.shift();
                     UpdateQueueElements();
-                    StartTrack(queue[0]);
+                    StartTrack(queue[0],0);
                 }
                 else{
                     console.log("Queue Empty!");
@@ -225,10 +242,10 @@
                             <h4 id="user_name">Artist</h4>
                         </div>
                         <div class="btn-group row" role="group" aria-label="...">
-                            <button onclick="TogglePlay()" type="button" class="btn btn-default">
+                            <!-- <button onclick="TogglePlay()" type="button" class="btn btn-default">
                                 <span id="play_button" class="glyphicon glyphicon-play" aria-hidden="true"></span>
-                            </button>
-                            <button onclick="StartNextTrack()" type="button" class="btn btn-default">
+                            </button> -->
+                            <button onclick="RequestNextTrack()" type="button" class="btn btn-default">
                                 <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
                             </button>
                         </div>

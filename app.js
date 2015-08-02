@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var moment = require('moment');
 
 
 // New call to compress content
@@ -16,15 +17,26 @@ var roomData = {
 	title: "A Room",
 	description: "A room for things",
 	users: [],
-	queue: []
+	queue: [],
+	isPlaying: false
 }
+
+var songTimerInterval;
+var lastSongStartTime;
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', function (socket) {
-	io.to(socket.id).emit('connect_success', roomData);
+	var currentPosition;
+	if(isPlaying){
+		currentPosition = moment()-lastSongStartTime;
+	}
+	else{
+		currentPosition = -1;
+	}
+	io.to(socket.id).emit('connect_success', {room: roomData, pos: currentPosition});
 
 	socket.on('set_name', function (data) {
 		socket.name = data.name;
@@ -41,9 +53,38 @@ io.on('connection', function (socket) {
 	socket.on('add_to_queue', function (data) {
 		roomData.queue.push(data.track);
 		console.log(data.track.title);
-		io.emit('queue_update', { queue: roomData.queue })
+		io.emit('queue_update', { queue: roomData.queue });
+		if(roomData.queue.length==1){
+			StartSong();
+		}
+	});
+
+	socket.on('request_next_track', function () {
+		OnSongEndOrSkip();
 	});
 });
+
+function OnSongEndOrSkip(){
+	roomData.isPlaying = false;
+	clearInterval(songTimerInterval);
+
+	roomData.queue.shift();
+	io.emit('queue_update', { queue: roomData.queue });
+	if(roomData.queue.length>0){
+		StartSong();
+	}
+}
+
+function StartSong(){
+	roomData.isPlaying = true;
+	var time = roomData.queue[0].duration;
+	time += 5000; // # Milisecond delay before starting a new song. (In case people are offset by a little)
+
+	songTimerInterval = setInterval(OnSongEndOrSkip,time);
+	lastSongStartTime = moment();
+
+	io.emit('start_next_song');
+}
 
 function userLeft(name) {
     for (var i = 0; i < roomData.users.length; i++) {
