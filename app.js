@@ -30,11 +30,11 @@ app.get('/', function(req, res){
 
 io.on('connection', function (socket) {
 	var currentPosition;
-	if(isPlaying){
+	if(roomData.isPlaying){
 		currentPosition = moment()-lastSongStartTime;
 	}
 	else{
-		currentPosition = -1;
+		currentPosition = 0;
 	}
 	io.to(socket.id).emit('connect_success', {room: roomData, pos: currentPosition});
 
