@@ -2,9 +2,9 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-server.listen(80);
+server.listen(3333);
 
-console.log("Listening on port 80!");
+console.log("Listening on port 3333!");
 
 var roomData = {
 	title: "A Room",
