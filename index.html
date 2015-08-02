@@ -39,12 +39,36 @@
                 font-family: 'Cuprum', sans-serif;
             }
         </style>
-
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
         <script src="//connect.soundcloud.com/sdk-2.0.0.js"></script>
         <script type="text/javascript" src="soundmanager/script/soundmanager2.js"></script>
         <script type="text/javascript">
+
+            //Socket Stuff/////////////////////////////////////////////////
+            var socket = io.connect('http://localhost');
+
+            socket.on('connect_success', function (data) {
+                console.log("Connect Success!");
+                console.log(data);
+                var setName = prompt("Please enter your name", "DumbButt");
+                socket.emit('set_name', { name: setName });
+
+                socket.on('user_left', function (data) {
+                console.log(data.name + " left!");
+                });
+
+                socket.on('user_joined', function (data) {
+                    console.log(data.name + " joined!");
+                });
+
+                socket.on('queue_update', function (data) {
+                    queue = data.queue;
+                    UpdateQueueElements();
+                });
+            });
+            ///////////////////////////////////////////////////////////////
 
             var cid     = '9896695e978359ad6e39e1b98f22abb4';
             var ready   = false;
@@ -108,16 +132,17 @@
             }
 
             function AddToQueue(track){
-                var autoPlay=false;
-                if(queue.length==0){
-                    autoPlay=true;
-                }
-                queue.push(track);
-                UpdateQueueElements();
-                if(autoPlay){
-                    StartTrack(queue[0]);
-                }
-                console.log(queue);
+                // var autoPlay=false;
+                // if(queue.length==0){
+                //     autoPlay=true;
+                // }
+                // queue.push(track);
+                // UpdateQueueElements();
+                // if(autoPlay){
+                //     StartTrack(queue[0]);
+                // }
+                // console.log(queue);
+                socket.emit('set_name', { track: track});
             }
 
             function StartNextTrack(){
@@ -204,7 +229,6 @@
                             <button onclick="TogglePlay()" type="button" class="btn btn-default">
                                 <span id="play_button" class="glyphicon glyphicon-play" aria-hidden="true"></span>
                             </button>
-                            <!-- <button onclick="soundManager.stop('currentSound')" type="button" class="btn btn-default">Stop</button> -->
                             <button onclick="StartNextTrack()" type="button" class="btn btn-default">
                                 <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
                             </button>

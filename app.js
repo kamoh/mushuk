@@ -16,18 +16,23 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function (socket) {
-  io.to(socket.id).emit('connect_success', roomData);
+	io.to(socket.id).emit('connect_success', roomData);
 
-  socket.on('set_name', function (data) {
-  	socket.name = data.name;
-  	roomData.users.push(socket.name);
-    console.log(socket.name + " has joined!");
-    io.emit('user_joined', {name: socket.name, list: roomData.users});
-  });
+	socket.on('set_name', function (data) {
+		socket.name = data.name;
+		roomData.users.push(socket.name);
+		console.log(socket.name + " has joined!");
+		io.emit('user_joined', {name: socket.name, list: roomData.users});
+	});
 
-  socket.on('disconnect', function(){
-    console.log(socket.name + ' disconnected!');
-  });
+	socket.on('disconnect', function(){
+		console.log(socket.name + ' disconnected!');
+	});
+
+	socket.on('add_to_queue', function (data) {
+		queue.push(data);
+		io.emit('queue_update', { queue: roomData.queue })
+	});
 });
 
 function userLeft(name) {
