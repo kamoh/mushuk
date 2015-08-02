@@ -1,6 +1,12 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+
+// New call to compress content
+//app.use(express.compress());
+
+app.use(express.static(__dirname + '/public'));
 
 server.listen(3333);
 
