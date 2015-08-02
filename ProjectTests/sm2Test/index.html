@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>Mushuk: Uzbek for Cat</title>
+        <link href='http://fonts.googleapis.com/css?family=Cuprum:700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
         <style>
             .center {
@@ -32,6 +33,10 @@
                 padding: 10px;
                 position: fixed;
                 bottom: 0;
+            }
+
+            .header-text{
+                font-family: 'Cuprum', sans-serif;
             }
         </style>
 
@@ -183,7 +188,7 @@
     </head>
 
     <body style="background-color:#222222">
-        <h1 class="center" style="color: lightgrey; ">Mushuk</h1>
+        <h1 class="center header-text" style="color: lightgrey; ">Mushuk</h1>
         <div class="container">
             <div class="jumbotron song-player">
                 <div class="row">
@@ -217,7 +222,7 @@
 
         <div class="container">
             <h3 style="color: lightgrey">Search</h3>
-            <input type="text" name="search" id="search"/>
+            <input class="header-text" type="text" name="search" id="search"/>
             <button onclick="Search()">Find Song!</button>
             <hr/>
             <div id="search_results" class="container">
