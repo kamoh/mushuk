@@ -56,6 +56,7 @@
                 console.log(data);
 
                 queue = data.room.queue;
+                UpdateQueueElements();
 
                 if(data.room.isPlaying){
                     StartTrack(queue[0],data.pos);
@@ -129,14 +130,11 @@
                     autoPlay: true,
                     multiShot: false,
                     multiShotEvents: false,
+                    position: pos,
                     whileplaying: function() {
                             document.getElementById('song_progress').value = this.position/this.duration;
                     }
                 });
-
-                if(pos!=null){
-                    currentSound.position = pos;
-                }
 
                 //onfinish: function(){StartNextTrack();}
 
