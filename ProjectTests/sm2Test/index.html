@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>Mushuk: Uzbek for Cat</title>
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -11,6 +12,7 @@
             var ready   = false;
             var track_url;
             var currentSound;
+            var latestSearchResults = [];
 
             SC.initialize({
               client_id: cid
@@ -25,33 +27,30 @@
                 }
             });
 
-            function StartSong(){
+            function StartTrack(trackNumber){
                 soundManager.stop('currentSound');
                 soundManager.destroySound("currentSound");
 
-                track_url = document.getElementById("url").value;
-                
-                SC.get('/resolve', { url: track_url }, function(track) {
-                    var art = track.artwork_url;
-                    art = art.replace("-large", '-crop');
-                    document.getElementById("album_art").src = art;
-                    document.getElementById("song_name").innerHTML = track.title;
-                    document.getElementById("user_name").innerHTML = track.user.username;
+                var track = latestSearchResults[trackNumber];
+                var art = track.artwork_url;
+                art = art.replace("-large", '-crop');
+                document.getElementById("album_art").src = art;
+                document.getElementById("song_name").innerHTML = track.title;
+                document.getElementById("user_name").innerHTML = track.user.username;
 
-                    currentSound = soundManager.createSound({
-                        id: "currentSound", // optional: provide your own unique id
-                        url: track.stream_url + '?client_id=' + cid,
-                        autoLoad: true,
-                        autoPlay: true,
-                        multiShot: false,
-                        multiShotEvents: false,
-                        whileplaying: function() {
-                                document.getElementById('song_progress').value = this.position/this.duration;
-                        }
-                    });
-
-                    document.getElementById("play_button").innerHTML = "Pause";
+                currentSound = soundManager.createSound({
+                    id: "currentSound", // optional: provide your own unique id
+                    url: track.stream_url + '?client_id=' + cid,
+                    autoLoad: true,
+                    autoPlay: true,
+                    multiShot: false,
+                    multiShotEvents: false,
+                    whileplaying: function() {
+                            document.getElementById('song_progress').value = this.position/this.duration;
+                    }
                 });
+
+                document.getElementById("play_button").innerHTML = "Pause";
             }
 
             function TogglePlay(){
@@ -63,18 +62,63 @@
                     document.getElementById("play_button").innerHTML = "Pause";
                 }
             }
+
+            function Search(){
+                var query = document.getElementById("search").value;
+
+                SC.get('/tracks', { q: query}, function(tracks) {
+                  console.log(tracks);
+                  latestSearchResults.length = 0;
+                  latestSearchResults = tracks;
+                  $("#search_results").empty();
+                  for (var i=0; i<tracks.length; i++) {
+                      RenderSearchResult(i,tracks[i]);
+                  };
+                });
+            }
+
+            function RenderSearchResult(resultNum,track){
+                var id      = track.id;
+                var title   = "<h4>" + track.title + "</h4>";
+                var user    = "<h5>" + track.user.username + "</h5>";
+
+                var panel = $('<div></div')
+                .appendTo($("#search_results"))
+                .attr('class', "panel panel-default")
+                .bind('click', function(){StartTrack(resultNum);});
+
+                var panelBody = $('<div></div>')
+                .appendTo(panel)
+                .attr('class',"panel-body")
+
+                panelBody.append(title + user);
+            }
+
         </script>
     </head>
 
-    <body>
-        <h1>Soundmanager Test</h1>
-        <img id="album_art" src="http://gfm.fm/assets/img/default-albumart.png" alt="Album Art" style="border: 5px solid grey"/>
-        <progress id="song_progress" value="0" max="1"></progress>
-        <h3 id="song_name">Song</h3>
-        <h4 id="user_name">Artist</h4>
-        <input type="text" name="url" id="url"/>
-        <button onclick="StartSong()">Get Song!</button>
-        <button onclick="soundManager.stop('currentSound')">Stop</button>
-        <button id="play_button" onclick="TogglePlay()">Play</button>
+    <body style="background-color:#222222">
+        <h1 style="color: lightgrey">Soundmanager Test</h1>
+        <div class="container">
+            <div class="jumbotron">
+                <img id="album_art" src="http://gfm.fm/assets/img/default-albumart.png" alt="Album Art" style="border: 5px solid grey"/>
+                <h3 id="song_name">Song</h3>
+                <h4 id="user_name">Artist</h4>
+                <button id="play_button" onclick="TogglePlay()">Play</button>
+                <button onclick="soundManager.stop('currentSound')">Stop</button>
+                <progress id="song_progress" value="0" max="1"></progress>
+            </div>
+        </div>
+        <hr/>
+
+        <div class="container">
+            <h3 style="color: lightgrey">Search</h3>
+            <input type="text" name="search" id="search"/>
+            <button onclick="Search()">Find Song!</button>
+            <hr/>
+            <div id="search_results" class="container">
+                
+            </div>
+        </div>
     </body>
 </html>
