@@ -4,6 +4,8 @@ var io = require('socket.io')(server);
 
 server.listen(80);
 
+console.log("Listening on port 80!");
+
 var roomData = {
 	title: "A Room",
 	description: "A room for things",
@@ -12,7 +14,7 @@ var roomData = {
 }
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/socket.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', function (socket) {
@@ -26,25 +28,25 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('disconnect', function(){
+		userLeft(socket.name);
 		console.log(socket.name + ' disconnected!');
 	});
 
 	socket.on('add_to_queue', function (data) {
-		room_data.queue.push(data);
+		roomData.queue.push(data.track);
+		console.log(data.track.title);
 		io.emit('queue_update', { queue: roomData.queue })
 	});
 });
 
 function userLeft(name) {
     for (var i = 0; i < roomData.users.length; i++) {
-      if (name === clientList[i]) {
-        console.log("name is: " + name);
+      if (name === roomData.users[i]) {
+        console.log("Removing: " + name);
         roomData.users.splice(i, 1);
       };
     }
 
-    //Maybe should have client remove locally but just passing list for easiness.
    	io.emit('user_left', {name:name, list: roomData.users})
-    updateClientUserList(roomData.users);
     console.log('New Client List: ' + roomData.users);
  };

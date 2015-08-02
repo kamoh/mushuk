@@ -64,8 +64,17 @@
                 });
 
                 socket.on('queue_update', function (data) {
+                    var autoPlay=false;
+                    if(queue.length==0){
+                        autoPlay=true;
+                    }
+
                     queue = data.queue;
                     UpdateQueueElements();
+                    
+                    if(autoPlay){
+                        StartTrack(queue[0]);
+                    }
                 });
             });
             ///////////////////////////////////////////////////////////////
@@ -85,7 +94,7 @@
                 flashVersion: 9, // optional: shiny features (default = 8)
                 preferFlash: false,
                 onready: function() {
-                    ready       = true; //I'm assuming soundManager just has a ready property.
+                    ready       = true; //I'm assuming soundManager just has a ready property. Too lazy.
                     track_url   = 'https://soundcloud.com/hadouken/hadouken-bliss-out-1';
                 }
             });
@@ -132,16 +141,6 @@
             }
 
             function AddToQueue(track){
-                // var autoPlay=false;
-                // if(queue.length==0){
-                //     autoPlay=true;
-                // }
-                // queue.push(track);
-                // UpdateQueueElements();
-                // if(autoPlay){
-                //     StartTrack(queue[0]);
-                // }
-                // console.log(queue);
                 socket.emit('add_to_queue', { track: track});
             }
 
