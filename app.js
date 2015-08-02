@@ -30,7 +30,7 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('add_to_queue', function (data) {
-		queue.push(data);
+		room_data.queue.push(data);
 		io.emit('queue_update', { queue: roomData.queue })
 	});
 });
