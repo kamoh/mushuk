@@ -9,6 +9,11 @@
                 width: 60%;
                 padding: 10px;
             }
+
+            .now-playing {
+                color: lightgrey,
+                background-color: #444444;
+            }
         </style>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -40,9 +45,13 @@
             function StartTrack(track){
                 soundManager.stop('currentSound');
                 soundManager.destroySound("currentSound");
-
-                var art = track.artwork_url;
-                art = art.replace("-large", '-crop');
+                var art;
+                if(track.artwork_url!=null){
+                    art = track.artwork_url.replace("-large", '-crop');
+                }
+                else{
+                    art="http://gfm.fm/assets/img/default-albumart.png";
+                }
                 document.getElementById("album_art").src = art;
                 document.getElementById("song_name").innerHTML = track.title;
                 document.getElementById("user_name").innerHTML = track.user.username;
@@ -115,7 +124,9 @@
                 //Clear queue elements
                 $("#queue").empty();
                 for (var i=0; i<queue.length; i++) {
-                    RenderQueueElement(i)
+                    if(i>0){
+                        RenderQueueElement(i);
+                    }
                 }
             }
 
@@ -128,19 +139,14 @@
 
                 var panel = $('<div></div')
                 .appendTo($("#queue"))
-                .attr('class', "panel panel-default");
+                .attr('class', "now-playing panel");
 
                 var panelBody = $('<div></div>')
                 .appendTo(panel)
                 .attr('class',"panel-body");
 
-                //HACK: Best hack 2015
-                var nowPlaying = "";
-                if(elementNum==0){
-                    nowPlaying = "Now Playing: ";
-                }
 
-                panelBody.append(nowPlaying + title + user);
+                panelBody.append(title + user);
             }
 
             function RenderSearchResult(resultNum,track){
