@@ -3,14 +3,14 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
+
 // New call to compress content
 //app.use(express.compress());
 
 app.use(express.static(__dirname + '/public'));
+en(process.env.PORT || 5000);
 
-server.listen(3333);
-
-console.log("Listening on port 3333!");
+console.log("Listening on port " + process.env.PORT + "!");
 
 var roomData = {
 	title: "A Room",
