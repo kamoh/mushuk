@@ -1,0 +1,20 @@
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script>
+  var socket = io.connect('http://localhost');
+
+  socket.on('connect_success', function (data) {
+  	console.log("Connect Success!");
+    console.log(data);
+    var setName = prompt("Please enter your name", "DumbButt");
+    socket.emit('set_name', { name: setName });
+  });
+
+  socket.on('user_left', function (data) {
+  	console.log(data.name + " left!");
+  });
+
+  socket.on('user_joined', function (data) {
+  	console.log(data.name + " joined!");
+  });
+  
+</script>

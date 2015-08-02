@@ -1,0 +1,26 @@
+{
+  "name": "mushuk",
+  "version": "0.0.2",
+  "description": "Uzbek for Cat",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://NoNameGhost@github.com/kamoh/mushuk.git"
+  },
+  "keywords": [
+    "music",
+    "cat"
+  ],
+  "author": "Neil Sveri and Ben Serviss",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kamoh/mushuk/issues"
+  },
+  "homepage": "https://github.com/kamoh/mushuk#readme",
+  "dependencies": {
+    "express": "^4.13.2"
+  }
+}
