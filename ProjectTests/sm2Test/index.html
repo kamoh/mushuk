@@ -27,6 +27,12 @@
             .track {
                 height: 100%;
             }
+
+            .footer-link{
+                padding: 10px;
+                position: fixed;
+                bottom: 0;
+            }
         </style>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -68,6 +74,7 @@
                 $("#album_art").attr('src',art)
                 $("#song_name").html(track.title);
                 $("#user_name").html(track.user.username);
+                $('#soundcloud_link').attr('href',track.permalink_url);
 
                 currentSound = soundManager.createSound({
                     id: "currentSound", // optional: provide your own unique id
@@ -198,6 +205,7 @@
                             </button>
                         </div>
                         <progress id="song_progress" value="0" max="1"></progress>
+                        <a id="soundcloud_link" href="http://www.soundcloud.com"><img src="https://developers.soundcloud.com/assets/logo_black-8c4cb46bf63fda8936f9a4d967416dc6.png"/></a>
                     </div>
                     <div class="col-md-6 well fill queue">
                         <div id="queue" class="list-group"></div>
@@ -216,5 +224,6 @@
                 
             </div>
         </div>
+        <a class="footer-link" href="http://www.soundcloud.com"><img src="https://developers.soundcloud.com/assets/powered_by_white-371bd6967352fcc89673d4c81f7e5661.png"/></a>
     </body>
 </html>
