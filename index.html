@@ -142,7 +142,7 @@
                 //     StartTrack(queue[0]);
                 // }
                 // console.log(queue);
-                socket.emit('set_name', { track: track});
+                socket.emit('add_to_queue', { track: track});
             }
 
             function StartNextTrack(){
