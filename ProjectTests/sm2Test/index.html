@@ -52,9 +52,9 @@
                 else{
                     art="http://gfm.fm/assets/img/default-albumart.png";
                 }
-                document.getElementById("album_art").src = art;
-                document.getElementById("song_name").innerHTML = track.title;
-                document.getElementById("user_name").innerHTML = track.user.username;
+                $("#album_art").attr('src',art)
+                $("#song_name").html(track.title);
+                $("#user_name").html(track.user.username);
 
                 currentSound = soundManager.createSound({
                     id: "currentSound", // optional: provide your own unique id
@@ -137,16 +137,11 @@
                 var title   = "<h4>" + track.title + "</h4>";
                 var user    = "<h5>" + track.user.username + "</h5>";
 
-                var panel = $('<div></div')
+                var listItem = $('<li></li>')
                 .appendTo($("#queue"))
-                .attr('class', "now-playing panel");
+                .attr('class', "list-group-item");
 
-                var panelBody = $('<div></div>')
-                .appendTo(panel)
-                .attr('class',"panel-body");
-
-
-                panelBody.append(title + user);
+                listItem.append(title + user);
             }
 
             function RenderSearchResult(resultNum,track){
@@ -154,16 +149,13 @@
                 var title   = "<h4>" + track.title + "</h4>";
                 var user    = "<h5>" + track.user.username + "</h5>";
 
-                var panel = $('<div></div')
+                var listItem = $('<button></button>')
                 .appendTo($("#search_results"))
-                .attr('class', "panel panel-default")
+                .attr('type',"button")
+                .attr('class', "list-group-item")
                 .bind('click', function(){AddToQueue(latestSearchResults[resultNum]);});
 
-                var panelBody = $('<div></div>')
-                .appendTo(panel)
-                .attr('class',"panel-body");
-
-                panelBody.append(title + user);
+                listItem.append(title + user);
             }
 
 
@@ -183,7 +175,7 @@
                     <button onclick="StartNextTrack()" type="button" class="btn btn-default">Skip</button>
                 </div>
                 <progress id="song_progress" value="0" max="1"></progress>
-                <div id="queue" class="container">
+                <div id="queue" class="list-group">
 
                 </div>
             </div>
