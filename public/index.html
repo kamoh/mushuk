@@ -226,7 +226,7 @@
                 var listItem = $('<li></li>')
                 .appendTo($("#queue"))
                 .attr('class', "list-group-item");
-                
+
                 var row = $('<div></div>')
                 .appendTo(listItem)
                 .attr('class', "row");
@@ -242,11 +242,11 @@
                 var colImage = $('<img>')
                 .appendTo(row)
                 .attr('src', art)
-                .attr('class', "col-md-1");
+                .attr('class', "col-md-2");
 
                 var colText = $('<div></div>')
                 .appendTo(row)
-                .attr('class', "col-md-6");
+                .attr('class', "col-md-3");
 
                 colText.append(title + user);
             }
