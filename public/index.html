@@ -47,7 +47,7 @@
         <script type="text/javascript">
 
             //Socket Stuff/////////////////////////////////////////////////
-            var socket = io.connect('http://mushuk.herokuapp.com'),
+            var socket = io.connect('http://mushuk-dev.herokuapp.com'),
             noNames = ["goober","monkeybat","moosejamms","grumpkin","derf-pooper","roosta","sounddrooper","tacobreath","lolwut","uncle jemima","front-door farter","carseat","air conditioner","lint roller","butterscotch krumpet","tuba repairman","pocket salesman","car door inspector","used gum aficionado","k-pop fanatic","beer ombudsman","big bird impersonator","graffiti stain","wisdom tooth","ignorance tooth","pocket harmonica", "dumb butt"],
             defaultName = noNames[Math.floor(Math.random() * noNames.length)] + Math.floor(Math.random(1,9999)*1000);
 
@@ -62,11 +62,11 @@
                     StartTrack(queue[0],data.pos);
                 }
 
-                var setName = prompt("Please enter your name", defaultName);
-                if(setName == null){
-                    setName = defaultName;
-                }
-                socket.emit('set_name', { name: setName });
+                //var setName = prompt("Please enter your name", defaultName);
+                // if(setName == null){
+                //     setName = defaultName;
+                // }
+                socket.emit('set_name', { name: defaultName });
 
                 socket.on('user_left', function (data) {
                     console.log(data.name + " left!");
@@ -93,6 +93,8 @@
             var currentSound;
             var latestSearchResults = [];
             var queue = [];
+
+            var isMuted = false;
 
             SC.initialize({
               client_id: cid
@@ -130,6 +132,7 @@
                     autoPlay: true,
                     multiShot: false,
                     multiShotEvents: false,
+                    muted: isMuted,
                     position: pos,
                     whileplaying: function() {
                             document.getElementById('song_progress').value = this.position/this.duration;
@@ -148,6 +151,17 @@
                 }
                 else{
                     //$("#play_button").attr('class','glyphicon glyphicon-pause');
+                }
+            }
+
+            function ToggleMute(){
+                currentSound.ToggleMute();
+                isMuted = currentSound.muted;
+                if(isMuted){
+                   $("#mute_button").attr('class','glyphicon glyphicon-volume-off');
+                }
+                else{
+                    $("#mute_button").attr('class','glyphicon glyphicon-volume-up');
                 }
             }
 
