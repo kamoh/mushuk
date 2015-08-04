@@ -8,6 +8,11 @@ var moment = require('moment');
 // New call to compress content
 //app.use(express.compress());
 
+var http = require("http");
+setInterval(function() {
+    http.get("http://mushuk-dev.herokuapp.com");
+}, 600000);
+
 app.use(express.static(__dirname + '/public'));
 server.listen(process.env.PORT || 5000);
 
