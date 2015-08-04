@@ -233,7 +233,7 @@
 
                 var art;
                 if(track.artwork_url!=null){
-                    art = track.artwork_url.replace("-large", '-t67x67');
+                    art = track.artwork_url;
                 }
                 else{
                     art="http://gfm.fm/assets/img/default-albumart.png";
@@ -242,11 +242,11 @@
                 var colImage = $('<img>')
                 .appendTo(row)
                 .attr('src', art)
-                .attr('class', "col-md-2");
+                .attr('class', "col-md-4");
 
                 var colText = $('<div></div>')
                 .appendTo(row)
-                .attr('class', "col-md-3");
+                .attr('class', "col-md-8");
 
                 colText.append(title + user);
             }
@@ -281,7 +281,7 @@
 
                 var colText = $('<div></div>')
                 .appendTo(row)
-                .attr('class', "col-md-6");
+                .attr('class', "col-md-9");
 
                 colText.append(title + user);
             }
