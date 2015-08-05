@@ -5,8 +5,7 @@ var io = require('socket.io')(server);
 var moment = require('moment');
 
 
-// New call to compress content
-//app.use(express.compress());
+//EXPRESS+SERVER INIT/////////////////////////
 
 var http = require("http");
 setInterval(function() {
@@ -18,87 +17,95 @@ server.listen(process.env.PORT || 5000);
 
 console.log("Listening on port " + process.env.PORT + "!");
 
-var roomData = {
-	title: "A Room",
-	description: "A room for things",
-	users: [],
-	queue: [],
-	isPlaying: false
-}
-
-var songTimerInterval;
-var lastSongStartTime;
-
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
+//////////////////////////////////////////////
+
+//SOCKET STUFF////////////////////////////////
+var serverData = {
+	users: [],
+	rooms: []
+}
+
 io.on('connection', function (socket) {
+	socket.on('disconnect', function(){
+		UserLeft(socket.name);
+		console.log(socket.name + ' disconnected!');
+	});
+
+	socket.on('set_name', function (data) {
+		socket.name = data.name;
+		serverData.users.push(socket.name);
+
+		socket.emit('update_room_list', {rooms:serverData.rooms});
+		//console.log(socket.name + " has joined!");
+		//io.emit('user_joined', {name: socket.name, list: roomData.users});
+
+		socket.on('create_room', function (roomInfo) {
+			var id = uuid.v4();
+		    var room = new Room(roomInfo.name, id, roomInfo.description);
+		    rooms[id] = room;
+		    //io.sockets.emit("update_room_list", {rooms: serverData.rooms}); //Just have people manually refresh
+		    socket.room = name; //name the room
+		    socket.join(socket.room); //auto-join the creator to the room
+		    room.addPerson(socket.name); //also add the person to the room object
+		    OnJoinRoom(socket);
+		});
+
+		socket.on('join_room', function (id) {
+			var room = serverData.rooms[id];
+			room.AddPerson(socket.name);
+			socket.room = room;
+			socket.join(socket.room);
+			io.sockets.in(socket.room).emit('user_joined', {{name: socket.name, list: socket.room.users}});
+			OnJoinRoom(socket);
+		});
+
+	});
+	
+});
+
+//These handlers should be defined in room.
+function OnJoinRoom(socket){
+
 	var currentPosition;
-	if(roomData.isPlaying){
-		currentPosition = moment()-lastSongStartTime;
+	if(socket.room.isPlaying){
+		currentPosition = moment()-socket.room.lastSongStartTime;
 	}
 	else{
 		currentPosition = 0;
 	}
 	io.to(socket.id).emit('connect_success', {room: roomData, pos: currentPosition});
 
-	socket.on('set_name', function (data) {
-		socket.name = data.name;
-		roomData.users.push(socket.name);
-		console.log(socket.name + " has joined!");
-		io.emit('user_joined', {name: socket.name, list: roomData.users});
-	});
-
-	socket.on('disconnect', function(){
-		userLeft(socket.name);
-		console.log(socket.name + ' disconnected!');
-	});
-
 	socket.on('add_to_queue', function (data) {
-		roomData.queue.push(data.track);
+		socket.room.queue.push(data.track);
 		console.log(data.track.title);
-		io.emit('queue_update', { queue: roomData.queue });
-		if(roomData.queue.length==1){
+		io.emit('queue_update', { queue: socket.room.queue });
+		if(socket.room.queue.length==1){
 			StartSong();
 		}
 	});
 
 	socket.on('request_next_track', function () {
-		OnSongEndOrSkip();
+		socket.room.OnSongEndOrSkip();
 	});
-});
 
-function OnSongEndOrSkip(){
-	roomData.isPlaying = false;
-	clearInterval(songTimerInterval);
-
-	roomData.queue.shift();
-	io.emit('queue_update', { queue: roomData.queue });
-	if(roomData.queue.length>0){
-		StartSong();
-	}
+	socket.on('disconnect', function (){
+		socket.room.UserLeft(socket.name);
+		UserLeft(socket.name);
+	});
 }
 
-function StartSong(){
-	roomData.isPlaying = true;
-	var time = roomData.queue[0].duration;
-	time += 5000; // # Milisecond delay before starting a new song. (In case people are offset by a little)
-
-	songTimerInterval = setInterval(OnSongEndOrSkip,time);
-	lastSongStartTime = moment();
-
-	io.emit('start_next_song');
-}
-
-function userLeft(name) {
-    for (var i = 0; i < roomData.users.length; i++) {
-      if (name === roomData.users[i]) {
-        console.log("Removing: " + name);
-        roomData.users.splice(i, 1);
-      };
+function UserLeft(name){
+    for (var i = 0; i < this.users.length; i++) {
+      if (name === this.users[i]) {
+        console.log("Removing from server: " + name);
+        this.users.splice(i, 1);
+      }
     }
 
-   	io.emit('user_left', {name:name, list: roomData.users})
-    console.log('New Client List: ' + roomData.users);
- };
+    console.log('New Client List: ' + this.users);
+}
+//////////////////////////////////////////////
