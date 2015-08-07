@@ -4,6 +4,7 @@ var cid     = '9896695e978359ad6e39e1b98f22abb4',
 	currentSound,
 	latestSearchResults = [],
 	queue = [],
+	rooms = [],
 	isMuted = false;
 
 var noNames = ["goober","monkeybat","moosejamms","grumpkin","derf-pooper","roosta","sounddrooper","tacobreath","lolwut","uncle jemima","front-door farter","carseat","air conditioner","lint roller","butterscotch krumpet","tuba repairman","pocket salesman","car door inspector","used gum aficionado","k-pop fanatic","beer ombudsman","big bird impersonator","graffiti stain","wisdom tooth","ignorance tooth","pocket harmonica", "dumb butt"],
