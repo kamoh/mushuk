@@ -59,7 +59,7 @@ io.on('connection', function (socket) {
 	socket.on('set_name', function (data) {
 		socket.name = data.name;
 		serverData.users.push(socket.name);
-
+		console.log(serverData.rooms);
 		socket.emit('update_room_list', {rooms:serverData.rooms});
 
 		socket.on('create_room', function (roomInfo) {
