@@ -84,7 +84,7 @@ function CreateRoom(roomInfo,socket){
 	var id = uuid.v4();
     var room = new Room(roomInfo.name, id, roomInfo.description);
     serverData.rooms[id] = room;
-    serverData.roomsInfo[id] = {name: room.name, id: room.id, description: room.description};
+    serverData.roomsInfo.push = {name: room.name, id: room.id, description: room.description};
     console.log(room);
     if(socket){
     	socket.room = name; //name the room
