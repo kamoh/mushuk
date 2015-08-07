@@ -104,6 +104,9 @@ function OnJoinRoom(socket){
 	else{
 		currentPosition = 0;
 	}
+
+	console.log(socket.name + " has joined a room!");
+
 	io.to(socket.id).emit('connect_success', {room: socket.room, pos: currentPosition});
 
 	socket.on('add_to_queue', function (data) {

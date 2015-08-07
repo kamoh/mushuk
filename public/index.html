@@ -105,10 +105,11 @@
                     if(e.keyCode == 13){
                         var name = $("#name_input").val();
                         //Can check if name is taken or not here.
-                        WaitForRoomList();
-                        socket.emit('set_name', { name: name });
                         $( "#name_input" ).off( "keydown" );
-                        $( "#name_input_group" ).fadeOut(750);
+                        $( "#name_input_group" ).fadeOut(750, function (){
+                            WaitForRoomList();
+                            socket.emit('set_name', { name: name });
+                        });
                     }
                 });
             });
@@ -130,9 +131,9 @@
 
             function RenderRoomObject(room){
 
-                var id      = room.id;
-                var name   = "<h3>" + room.name + "</h3>";
-                var description    = "<h5>" + room.description + "</h5>";
+                var id          = room.id;
+                var name        = "<h3>" + room.name + "</h3>";
+                var description = "<h5>" + room.description + "</h5>";
 
                 var listItem = $('<button></button>')
                 .appendTo($("#room_list"))
@@ -152,6 +153,7 @@
             }
 
             function JoinRoom(id){
+                console.log("Please join room: " + id);
                 socket.emit('join_room', id);
             }
 
