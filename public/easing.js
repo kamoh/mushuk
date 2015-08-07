@@ -1,4 +1,4 @@
-* 
+/* 
  * Please note: 
  * This is not the easing plugin, for that you need to go to 
  * http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js 
