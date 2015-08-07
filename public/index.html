@@ -114,8 +114,9 @@
             });
 
             function WaitForRoomList(){
-                socket.On('update_room_list', function (data) {
+                socket.on('update_room_list', function (data) {
                     rooms = data.rooms;
+                    ShowRoomList();
                 });
             }
 
