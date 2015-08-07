@@ -126,7 +126,7 @@ function OnJoinRoom(socket){
 	socket.on('disconnect', function (){
 		socket.room.UserLeft(socket.name);
 		UserLeft(socket.name);
-		socket.room.io.sockets.in(this).emit('user_left', {name:name, list: this.users});
+		io.sockets.in(socket.room).emit('user_left', {name:socket.name, list: socket.room.users});
 	});
 }
 
