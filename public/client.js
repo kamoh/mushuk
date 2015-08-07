@@ -1,6 +1,7 @@
 var socket = io.connect('http://mushuk-dev.herokuapp.com');
 
 socket.on('connect_success', function (data) {
+    HideHeader();
     console.log("Connect Success!");
     console.log(data);
 
