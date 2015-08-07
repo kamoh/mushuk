@@ -115,7 +115,7 @@
 
             function WaitForRoomList(){
                 socket.on('update_room_list', function (data) {
-                    rooms = data;
+                    rooms = JSON.parse(data);
                     console.log(data);
                     ShowRoomList();
                 });
