@@ -82,7 +82,7 @@ io.on('connection', function (socket) {
 
 function CreateRoom(roomInfo,socket){
 	var id = uuid.v4();
-    var room = new Room(roomInfo.name, id, roomInfo.description);
+    var room = new Room(roomInfo.name, id, roomInfo.description,io);
     serverData.rooms[id] = room;
     serverData.roomsInfo.push({name: room.name, id: room.id, description: room.description});
     console.log(room);
