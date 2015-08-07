@@ -1,4 +1,4 @@
-function Room(name, id, description,io) {  
+function Room(name, id, description) {  
 	this.name = name;
 	this.id = id;
 	//this.owner = owner; //Might need this at some point. For non-spamming purposes.
@@ -9,8 +9,6 @@ function Room(name, id, description,io) {
 	this.isPlaying = false;
 	this.songTimerInterval = null;
 	this.lastSongStartTime = null;
-
-	this.io = io;
 };
 
 Room.prototype.AddPerson = function(personID) {  
@@ -37,8 +35,6 @@ Room.prototype.StartSong = function(){
 
 	this.songTimerInterval = setInterval(OnSongEndOrSkip,time);
 	this.lastSongStartTime = moment();
-
-	this.io.sockets.in(this).emit('start_next_song');
 };
 
 //Should probably be by id. idk.
@@ -49,8 +45,6 @@ Room.prototype.UserLeft = function(name) {
         this.users.splice(i, 1);
       }
     }
-
-   	this.io.sockets.in(this).emit('user_left', {name:name, list: this.users});
 };
 
 module.exports = Room; 

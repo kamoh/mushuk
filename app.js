@@ -115,6 +115,7 @@ function OnJoinRoom(socket){
 		io.emit('queue_update', { queue: socket.room.queue });
 		if(socket.room.queue.length==1){
 			StartSong();
+			io.sockets.in(socket.room).emit('start_next_song');
 		}
 	});
 
@@ -125,6 +126,7 @@ function OnJoinRoom(socket){
 	socket.on('disconnect', function (){
 		socket.room.UserLeft(socket.name);
 		UserLeft(socket.name);
+		socket.room.io.sockets.in(this).emit('user_left', {name:name, list: this.users});
 	});
 }
 
