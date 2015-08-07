@@ -105,10 +105,10 @@
                     if(e.keyCode == 13){
                         var name = $("#name_input").val();
                         //Can check if name is taken or not here.
+                        WaitForRoomList();
                         socket.emit('set_name', { name: name });
                         $( "#name_input" ).off( "keydown" );
                         $( "#name_input_group" ).fadeOut(750);
-                        WaitForRoomList();
                     }
                 });
             });
@@ -116,6 +116,7 @@
             function WaitForRoomList(){
                 socket.on('update_room_list', function (data) {
                     rooms = data.rooms;
+                    console.log(rooms);
                     ShowRoomList();
                 });
             }
