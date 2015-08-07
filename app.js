@@ -44,7 +44,7 @@ var testRoom2 = {
 
 var testRoom3 = {
 	name: "Bird: A retrospective",
-	description: "In this enthralling biopic, the bird details his life as the word."
+	description: "In this enthralling biopic, Colin Farrel plays 'The Bird' throughout his life as the word."
 }
 
 CreateRoom (testRoom1);
@@ -71,10 +71,10 @@ io.on('connection', function (socket) {
 		socket.on('join_room', function (id) {
 			var room = serverData.rooms[id];
 			room.AddPerson(socket.id);
-			socket.room = room;
+			socket.room = room.name;
 			socket.join(socket.room);
-			io.sockets.in(socket.room).emit('user_joined', {name: socket.name, list: socket.room.users});
-			OnJoinRoom(socket);
+			io.sockets.in(socket.room).emit('user_joined', {name: socket.name, list: room.users});
+			OnJoinRoom(socket, id);
 		});
 
 	});
@@ -88,7 +88,7 @@ function CreateRoom(roomInfo,socket){
     serverData.roomsInfo.push({name: room.name, id: room.id, description: room.description});
     console.log(room);
     if(socket){
-    	socket.room = name; //name the room
+    	socket.room = roomInfo.name; //name the room
 	    socket.join(socket.room); //auto-join the creator to the room
 	    room.AddPerson(socket.id); //also add the person to the room object
 	    OnJoinRoom(socket);
@@ -96,12 +96,13 @@ function CreateRoom(roomInfo,socket){
 }
 
 //These handlers should be defined in room.
-function OnJoinRoom(socket){
+function OnJoinRoom(socket, id){
+	room = serverData.rooms[id];
 
 	//We should just send the last start time and have the client figure out the position of the song.
 	var currentPosition;
-	if(socket.room.isPlaying){
-		currentPosition = moment()-socket.room.lastSongStartTime;
+	if(room.isPlaying){
+		currentPosition = moment()-room.lastSongStartTime;
 	}
 	else{
 		currentPosition = 0;
@@ -109,26 +110,27 @@ function OnJoinRoom(socket){
 
 	console.log(socket.name + " has joined a room!");
 
-	io.to(socket.id).emit('connect_success', {room: socket.room.GetData(), pos: currentPosition});
+	io.to(socket.id).emit('connect_success', {room: room.GetData(), pos: currentPosition});
 
 	socket.on('add_to_queue', function (data) {
-		socket.room.queue.push(data.track);
+		room.queue.push(data.track);
 		console.log(data.track.title);
-		io.sockets.in(socket.room).emit('queue_update', { queue: socket.room.queue });
-		if(socket.room.queue.length==1){
-			socket.room.StartSong();
+		io.sockets.in(socket.room).emit('queue_update', { queue: room.queue });
+		if(room.queue.length==1){
+			room.StartSong();
 			io.sockets.in(socket.room).emit('start_next_song');
 		}
 	});
 
 	socket.on('request_next_track', function () {
-		socket.room.OnSongEndOrSkip();
+		room.OnSongEndOrSkip();
+		io.sockets.in(socket.room).emit('queue_update', { queue: room.queue });
 	});
 
 	socket.on('disconnect', function (){
-		socket.room.UserLeft(socket.id);
+		room.UserLeft(socket.id);
 		UserLeft(socket.id);
-		io.sockets.in(socket.room).emit('user_left', {name:socket.name, list: socket.room.users});
+		io.sockets.in(socket.room).emit('user_left', {name:socket.name, list: room.users});
 	});
 }
 
