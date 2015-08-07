@@ -69,7 +69,7 @@ io.on('connection', function (socket) {
 			room.AddPerson(socket.name);
 			socket.room = room;
 			socket.join(socket.room);
-			io.sockets.in(socket.room).emit('user_joined', {{name: socket.name, list: socket.room.users}});
+			io.sockets.in(socket.room).emit('user_joined', {name: socket.name, list: socket.room.users});
 			OnJoinRoom(socket);
 		});
 
