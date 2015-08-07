@@ -11,6 +11,20 @@
                 padding: 10px;
             }
 
+            .room-list {
+                /*text-align: center;*/
+                overflow-y: auto;
+                margin: auto;
+                height: 50%;
+            }
+
+
+            .vertical-center {
+                position: relative;
+                top: 50%;
+                transform: translateY(-100%);
+            }
+
             .fill { 
                 /*min-height: 100%;
                 height: 100%;*/
@@ -46,253 +60,135 @@
                 height: 50px;
                 border: 2px solid grey;
             }
+            .overlay {  
+                position:absolute;
+                top:0;
+                left:0;
+                width:100%;
+                height:100%;
+                z-index:1000;
+                background-color: #181818;
+            }
+            .header {
+                position:absolute;
+                bottom:0;
+                width:100%;
+                background-color: #111111;
+            }
+            .content {
+                padding-top: 6%;
+            }
+            .light-text{
+                color: lightgrey;
+            }
         </style>
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="http://gsgd.co.uk/sandbox/jquery/easing/jquery.easing.1.3.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-        <script src="//connect.soundcloud.com/sdk-2.0.0.js"></script>
+        <!--<script src="//connect.soundcloud.com/sdk-2.0.0.js"></script>-->
         <script type="text/javascript" src="soundmanager/script/soundmanager2.js"></script>
+        <script type="text/javascript" src="init.js"></script>
+        <script type="text/javascript" src="client.js"></script>
         <script type="text/javascript">
 
-            //Socket Stuff/////////////////////////////////////////////////
-            var socket = io.connect('http://mushuk-dev.herokuapp.com'),
-            noNames = ["goober","monkeybat","moosejamms","grumpkin","derf-pooper","roosta","sounddrooper","tacobreath","lolwut","uncle jemima","front-door farter","carseat","air conditioner","lint roller","butterscotch krumpet","tuba repairman","pocket salesman","car door inspector","used gum aficionado","k-pop fanatic","beer ombudsman","big bird impersonator","graffiti stain","wisdom tooth","ignorance tooth","pocket harmonica", "dumb butt"],
-            defaultName = noNames[Math.floor(Math.random() * noNames.length)] + Math.floor(Math.random(1,9999)*1000);
-
-            socket.on('connect_success', function (data) {
-                console.log("Connect Success!");
-                console.log(data);
-
-                queue = data.room.queue;
-                UpdateQueueElements();
-
-                if(data.room.isPlaying){
-                    StartTrack(queue[0],data.pos);
-                }
-
-                //var setName = prompt("Please enter your name", defaultName);
-                // if(setName == null){
-                //     setName = defaultName;
-                // }
-                socket.emit('set_name', { name: defaultName });
-
-                socket.on('user_left', function (data) {
-                    console.log(data.name + " left!");
-                });
-
-                socket.on('user_joined', function (data) {
-                    console.log(data.name + " joined!");
-                });
-
-                socket.on('queue_update', function (data) {
-                    queue = data.queue;
-                    UpdateQueueElements();
-                });
-
-                socket.on('start_next_song', function () {
-                    StartTrack(queue[0],0);
-                });
-            });
-            ///////////////////////////////////////////////////////////////
-
-            var cid     = '9896695e978359ad6e39e1b98f22abb4';
-            var ready   = false;
-            var track_url;
-            var currentSound;
-            var latestSearchResults = [];
-            var queue = [];
-
-            var isMuted = false;
-
-            SC.initialize({
-              client_id: cid
-            });
-
-            soundManager.setup({
-                flashVersion: 9, // optional: shiny features (default = 8)
-                preferFlash: false,
-                onready: function() {
-                    ready       = true; //I'm assuming soundManager just has a ready property. Too lazy.
-                    track_url   = 'https://soundcloud.com/hadouken/hadouken-bliss-out-1';
-                }
-            });
-
-            function StartTrack(track,pos){
-
-                soundManager.stop('currentSound');
-                soundManager.destroySound("currentSound");
-                var art;
-                if(track.artwork_url!=null){
-                    art = track.artwork_url.replace("-large", '-crop');
-                }
-                else{
-                    art="http://gfm.fm/assets/img/default-albumart.png";
-                }
-                $("#album_art").attr('src',art)
-                $("#song_name").html(track.title);
-                $("#user_name").html(track.user.username);
-                $('#soundcloud_link').attr('href',track.permalink_url);
-
-                currentSound = soundManager.createSound({
-                    id: "currentSound", // optional: provide your own unique id
-                    url: track.stream_url + '?client_id=' + cid,
-                    autoLoad: true,
-                    autoPlay: true,
-                    multiShot: false,
-                    multiShotEvents: false,
-                    muted: isMuted,
-                    position: pos,
-                    whileplaying: function() {
-                            document.getElementById('song_progress').value = this.position/this.duration;
+            $(document).ready(function(){
+                $("#room_group").hide();
+                var bkgrs =[
+                    "background1.jpg",
+                    "background2.png",
+                    "background3.png"
+                ]
+                var toUse = bkgrs[Math.floor(Math.random() * bkgrs.length)];
+                $('body').attr('background',toUse);
+                $( "#name_input" ).keydown(function(e) {
+                    if(e.keyCode == 13){
+                        var name = $("#name_input").val();
+                        //Can check if name is taken or not here.
+                        socket.emit('set_name', { name: name });
+                        $( "#name_input" ).off( "keydown" );
+                        $( "#name_input_group" ).fadeOut(750);
+                        WaitForRoomList();
                     }
                 });
+            });
 
-                //onfinish: function(){StartNextTrack();}
-
-                //$("#play_button").attr('class','glyphicon glyphicon-pause');
-            }
-
-            function TogglePlay(){
-                currentSound.togglePause();
-                if(currentSound.paused){
-                   // $("#play_button").attr('class','glyphicon glyphicon-play');
-                }
-                else{
-                    //$("#play_button").attr('class','glyphicon glyphicon-pause');
-                }
-            }
-
-            function ToggleMute(){
-                currentSound.toggleMute();
-                isMuted = currentSound.muted;
-                if(isMuted){
-                   $("#mute_button").attr('class','glyphicon glyphicon-volume-off');
-                }
-                else{
-                    $("#mute_button").attr('class','glyphicon glyphicon-volume-up');
-                }
-            }
-
-            function AddToQueue(track){
-                socket.emit('add_to_queue', { track: track});
-            }
-
-            function RequestNextTrack(){
-                socket.emit('request_next_track');
-            }
-
-            function StartNextTrack(){
-                if(queue.length>1){
-                    queue.shift();
-                    UpdateQueueElements();
-                    StartTrack(queue[0],0);
-                }
-                else{
-                    console.log("Queue Empty!");
-                }
-            }
-
-            function Search(){
-                var query = document.getElementById("search").value;
-
-                SC.get('/tracks', { q: query}, function(tracks) {
-                  console.log(tracks);
-                  latestSearchResults.length = 0;
-                  latestSearchResults = tracks;
-                  $("#search_results").empty();
-                  for (var i=0; i<tracks.length; i++) {
-                      RenderSearchResult(i,tracks[i]);
-                  };
+            function WaitForRoomList(){
+                socket.On('update_room_list', function (data) {
+                    rooms = data.rooms;
                 });
             }
 
-            function UpdateQueueElements(){
-                //Clear queue elements
-                $("#queue").empty();
-                for (var i=0; i<queue.length; i++) {
-                    if(i>0){
-                        RenderQueueElement(i);
-                    }
-                }
+            function ShowRoomList(){
+                rooms = data.rooms;
+                for (var i = 0; i < Things.length; i++) {
+                    renderRoomObject(rooms[i]);
+                };
+                $("#room_group").fadeIn(750);
             }
 
-            function RenderQueueElement(elementNum){
-                var track = queue[elementNum];
+            function RenderRoomObject(room){
 
-                var id      = track.id;
-                var title   = "<h4>" + track.title + "</h4>";
-                var user    = "<h5>" + track.user.username + "</h5>";
-
-                var listItem = $('<li></li>')
-                .appendTo($("#queue"))
-                .attr('class', "list-group-item");
-
-                var row = $('<div></div>')
-                .appendTo(listItem)
-                .attr('class', "row");
-
-                var art;
-                if(track.artwork_url!=null){
-                    art = track.artwork_url;
-                }
-                else{
-                    art="http://gfm.fm/assets/img/default-albumart.png";
-                }
-
-                var colImage = $('<img>')
-                .appendTo(row)
-                .attr('src', art)
-                .attr('class', "col-md-4");
-
-                var colText = $('<div></div>')
-                .appendTo(row)
-                .attr('class', "col-md-8");
-
-                colText.append(title + user);
-            }
-
-            function RenderSearchResult(resultNum,track){
-                var id      = track.id;
-                var title   = "<h4>" + track.title + "</h4>";
-                var user    = "<h5>" + track.user.username + "</h5>";
+                var id      = room.id;
+                var name   = "<h3>" + room.name + "</h3>";
+                var description    = "<h5>" + room.description + "</h5>";
 
                 var listItem = $('<button></button>')
-                .appendTo($("#search_results"))
+                .appendTo($("#room_list"))
                 .attr('type',"button")
                 .attr('class', "list-group-item")
-                .bind('click', function(){AddToQueue(latestSearchResults[resultNum]);});
-
-                var row = $('<div></div>')
-                .appendTo(listItem)
-                .attr('class', "row");
-
-                var art;
-                if(track.artwork_url!=null){
-                    art = track.artwork_url.replace("-large", '-t67x67');
-                }
-                else{
-                    art="http://gfm.fm/assets/img/default-albumart.png";
-                }
-
-                var colImage = $('<img>')
-                .appendTo(row)
-                .attr('src', art)
-                .attr('class', "col-md-1");
+                .bind('click', function(){JoinRoom(id);});
 
                 var colText = $('<div></div>')
-                .appendTo(row)
+                .appendTo(listItem)
                 .attr('class', "col-md-9");
 
-                colText.append(title + user);
+                colText.append(name + description);
             }
 
+            function CreateRoom(){
+                socket.emit('create_room', { name: $('#room_name_input').val() });
+            }
 
+            function JoinRoom(id){
+                socket.emit('join_room', id);
+            }
+
+            function HideHeader(){
+                console.log("Animating Out");
+                $("#overlay").animate({
+                    height: "6%"
+                }, 1000, "easeInOutQuad");
+            }
         </script>
     </head>
 
     <body style="background-color:#222222">
-        <h1 class="center header-text" style="color: lightgrey; ">Mushuk</h1>
-        <div class="container">
+
+        <div id="overlay" class="overlay">
+            <div id="join-elements" class="vertical-center container">
+                <div id="name_input_group" class="center">
+                    <h1 class="light-text header-text">Enter a name, motherfucker:</h1>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">I am known as: </span>
+                        <input id="name_input" type="text" class="form-control" placeholder="Motherfucker" aria-describedby="basic-addon1">
+                    </div>
+                </div>
+                <div id="room_group" class="center">
+                    <h1 class="light-text">Choose a room:</h1>
+                    <div id="room_list_container" class="container">
+                        <div id="room_list" class="col-md-9">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header">
+                <h1 class="center header-text light-text">Mushuk</h1>
+            </div>
+        </div>
+
+
+        <div id="content" class="content container">
             <div class="jumbotron song-player">
                 <div class="row">
                     <div class="col-md-6 track">

@@ -29,6 +29,25 @@ var serverData = {
 	rooms: []
 }
 
+var testRoom1 = {
+	name: "Muzak Room",
+	description: "The best fucking room get on my fucking level."
+}
+
+var testRoom2 = {
+	name: "DUBSTEP",
+	description: "WUBWUBWUBWUBWUBW wAAAAAAAAH ERRRNN DDDRRRR WUBWUB."
+}
+
+var testRoom3 = {
+	name: "Bird: A retrospective",
+	description: "In this enthralling biopic, the bird details his life as the word."
+}
+
+CreateRoom (testRoom1);
+CreateRoom (testRoom2);
+CreateRoom (testRoom3);
+
 io.on('connection', function (socket) {
 	socket.on('disconnect', function(){
 		UserLeft(socket.name);
@@ -40,18 +59,9 @@ io.on('connection', function (socket) {
 		serverData.users.push(socket.name);
 
 		socket.emit('update_room_list', {rooms:serverData.rooms});
-		//console.log(socket.name + " has joined!");
-		//io.emit('user_joined', {name: socket.name, list: roomData.users});
 
 		socket.on('create_room', function (roomInfo) {
-			var id = uuid.v4();
-		    var room = new Room(roomInfo.name, id, roomInfo.description);
-		    rooms[id] = room;
-		    //io.sockets.emit("update_room_list", {rooms: serverData.rooms}); //Just have people manually refresh
-		    socket.room = name; //name the room
-		    socket.join(socket.room); //auto-join the creator to the room
-		    room.addPerson(socket.name); //also add the person to the room object
-		    OnJoinRoom(socket);
+			CreateRoom(roomInfo,socket);
 		});
 
 		socket.on('join_room', function (id) {
@@ -67,6 +77,18 @@ io.on('connection', function (socket) {
 	
 });
 
+function CreateRoom(roomInfo,socket){
+	var id = uuid.v4();
+    var room = new Room(roomInfo.name, id, roomInfo.description);
+    rooms[id] = room;
+    if(socket){
+    	socket.room = name; //name the room
+	    socket.join(socket.room); //auto-join the creator to the room
+	    room.addPerson(socket.name); //also add the person to the room object
+	    OnJoinRoom(socket);
+    }
+}
+
 //These handlers should be defined in room.
 function OnJoinRoom(socket){
 
@@ -77,7 +99,7 @@ function OnJoinRoom(socket){
 	else{
 		currentPosition = 0;
 	}
-	io.to(socket.id).emit('connect_success', {room: roomData, pos: currentPosition});
+	io.to(socket.id).emit('connect_success', {room: socket.room, pos: currentPosition});
 
 	socket.on('add_to_queue', function (data) {
 		socket.room.queue.push(data.track);
