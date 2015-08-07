@@ -1,8 +1,10 @@
-var express = require('express');
-var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
-var moment = require('moment');
+var express = require('express')
+, app 		= express()
+, server 	= require('http').Server(app)
+, io 		= require('socket.io')(server)
+, moment 	= require('moment')
+, uuid 		= require('node-uuid')
+, Room 		= require('./room.js');
 
 
 //EXPRESS+SERVER INIT/////////////////////////
