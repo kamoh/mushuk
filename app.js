@@ -83,6 +83,7 @@ function CreateRoom(roomInfo,socket){
 	var id = uuid.v4();
     var room = new Room(roomInfo.name, id, roomInfo.description);
     serverData.rooms[id] = room;
+    console.log(room);
     if(socket){
     	socket.room = name; //name the room
 	    socket.join(socket.room); //auto-join the creator to the room
