@@ -1,3 +1,5 @@
+var moment = require('moment');
+
 function Room(name, id, description) {  
 	this.name = name;
 	this.id = id;
