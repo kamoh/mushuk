@@ -123,13 +123,13 @@ function OnJoinRoom(socket){
 }
 
 function UserLeft(name){
-    for (var i = 0; i < this.users.length; i++) {
-      if (name === this.users[i]) {
+    for (var i = 0; i < serverData.users.length; i++) {
+      if (name === serverData.users[i]) {
         console.log("Removing from server: " + name);
-        this.users.splice(i, 1);
+        serverData.users.splice(i, 1);
       }
     }
 
-    console.log('New Client List: ' + this.users);
+    console.log('New Client List: ' + serverData.users);
 }
 //////////////////////////////////////////////
