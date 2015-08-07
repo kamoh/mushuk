@@ -114,7 +114,7 @@ function OnJoinRoom(socket){
 		console.log(data.track.title);
 		io.emit('queue_update', { queue: socket.room.queue });
 		if(socket.room.queue.length==1){
-			StartSong();
+			socket.room.StartSong();
 			io.sockets.in(socket.room).emit('start_next_song');
 		}
 	});
