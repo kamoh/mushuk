@@ -52,16 +52,17 @@ CreateRoom (testRoom2);
 CreateRoom (testRoom3);
 
 io.on('connection', function (socket) {
-	socket.on('disconnect', function(){
-		UserLeft(socket.name);
-		console.log(socket.name + ' disconnected!');
-	});
-
 	socket.on('set_name', function (data) {
+
 		socket.name = data.name;
-		serverData.users.push(socket.name);
+		serverData.users.push(socket.id);
 		console.log(serverData.roomsInfo);
 		socket.emit('update_room_list', {rooms:serverData.roomsInfo});
+
+		socket.on('disconnect', function(){
+			UserLeft(socket.name);
+			console.log(socket.name + ' disconnected!');
+		});
 
 		socket.on('create_room', function (roomInfo) {
 			CreateRoom(roomInfo,socket);
@@ -69,7 +70,7 @@ io.on('connection', function (socket) {
 
 		socket.on('join_room', function (id) {
 			var room = serverData.rooms[id];
-			room.AddPerson(socket.name);
+			room.AddPerson(socket.id);
 			socket.room = room;
 			socket.join(socket.room);
 			io.sockets.in(socket.room).emit('user_joined', {name: socket.name, list: socket.room.users});
@@ -89,7 +90,7 @@ function CreateRoom(roomInfo,socket){
     if(socket){
     	socket.room = name; //name the room
 	    socket.join(socket.room); //auto-join the creator to the room
-	    room.addPerson(socket.name); //also add the person to the room object
+	    room.AddPerson(socket.id); //also add the person to the room object
 	    OnJoinRoom(socket);
     }
 }
@@ -106,7 +107,7 @@ function OnJoinRoom(socket){
 	}
 
 	console.log(socket.name + " has joined a room!");
-
+	console.log(socket.room);
 	io.to(socket.id).emit('connect_success', {room: JSON.stringify(socket.room), pos: currentPosition});
 
 	socket.on('add_to_queue', function (data) {
@@ -124,20 +125,17 @@ function OnJoinRoom(socket){
 	});
 
 	socket.on('disconnect', function (){
-		socket.room.UserLeft(socket.name);
-		UserLeft(socket.name);
+		socket.room.UserLeft(socket.id);
+		UserLeft(socket.id);
 		io.sockets.in(socket.room).emit('user_left', {name:socket.name, list: socket.room.users});
 	});
 }
 
-function UserLeft(name){
-    for (var i = 0; i < serverData.users.length; i++) {
-      if (name === serverData.users[i]) {
-        console.log("Removing from server: " + name);
-        serverData.users.splice(i, 1);
-      }
-    }
+function UserLeft(id){
+    var personIndex = serverData.users.indexOf(id);
+ 	console.log(serverData.users[personIndex] + " left the server!");
+	serverData.users.splice(personIndex, 1);
 
-    console.log('New Client List: ' + serverData.users);
+    //console.log('New Client List: ' + serverData.users);
 }
 //////////////////////////////////////////////

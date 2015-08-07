@@ -16,6 +16,7 @@ function Room(name, id, description) {
 Room.prototype.AddPerson = function(personID) {  
 	if (this.status === "available") {
 		this.users.push(personID);
+		console.log(this.users);
 	}
 };
 
@@ -40,13 +41,10 @@ Room.prototype.StartSong = function(){
 };
 
 //Should probably be by id. idk.
-Room.prototype.UserLeft = function(name) {
-    for (var i = 0; i < this.users.length; i++) {
-      if (name === this.users[i]) {
-        console.log("Removing from room: " + name);
-        this.users.splice(i, 1);
-      }
-    }
+Room.prototype.UserLeft = function(id) {
+ 	var personIndex = this.users.indexOf(id);
+ 	console.log(this.users[personIndex] + " left " + this.name + "!");
+	this.users.splice(personIndex, 1);
 };
 
 module.exports = Room; 
