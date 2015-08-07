@@ -5,8 +5,8 @@ socket.on('connect_success', function (data) {
     console.log("Connect Success!");
     console.log(data);
 
-    currentRoom = JSON.parse(data.room);
-    
+    currentRoom = data;
+
     queue = currentRoom.queue;
     UpdateQueueElements();
 

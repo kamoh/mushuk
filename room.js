@@ -13,6 +13,17 @@ function Room(name, id, description) {
 	this.lastSongStartTime = null;
 };
 
+Room.prototype.GetData = function() {
+	return {
+		name: this.name,
+		id: this.id,
+		description: this.description,
+		users: this.users,
+		queue: this.queue,
+		isPlaying: this.isPlaying
+	}
+}
+
 Room.prototype.AddPerson = function(personID) {  
 	if (this.status === "available") {
 		this.users.push(personID);

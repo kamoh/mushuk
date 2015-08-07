@@ -98,6 +98,7 @@ function CreateRoom(roomInfo,socket){
 //These handlers should be defined in room.
 function OnJoinRoom(socket){
 
+	//We should just send the last start time and have the client figure out the position of the song.
 	var currentPosition;
 	if(socket.room.isPlaying){
 		currentPosition = moment()-socket.room.lastSongStartTime;
@@ -107,8 +108,8 @@ function OnJoinRoom(socket){
 	}
 
 	console.log(socket.name + " has joined a room!");
-	console.log(socket.room);
-	io.to(socket.id).emit('connect_success', {room: JSON.stringify(socket.room), pos: currentPosition});
+
+	io.to(socket.id).emit('connect_success', {room: socket.room.GetData(), pos: currentPosition});
 
 	socket.on('add_to_queue', function (data) {
 		socket.room.queue.push(data.track);
