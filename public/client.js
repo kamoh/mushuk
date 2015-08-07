@@ -3,12 +3,14 @@ var socket = io.connect('http://mushuk-dev.herokuapp.com');
 socket.on('connect_success', function (data) {
     HideHeader();
     console.log("Connect Success!");
-    console.log(data);
 
     currentRoom = data;
-
+    console.log(currentRoom);
     queue = currentRoom.queue;
-    UpdateQueueElements();
+    console.log(queue);
+    if(queue.length>0){
+        UpdateQueueElements();
+    }
 
     if(currentRoom.isPlaying){
         StartTrack(queue[0],data.pos);
