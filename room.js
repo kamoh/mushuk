@@ -13,7 +13,7 @@ function Room(name, id, description) {
 
 Room.prototype.AddPerson = function(personID) {  
 	if (this.status === "available") {
-		this.people.push(personID);
+		this.users.push(personID);
 	}
 };
 
