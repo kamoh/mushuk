@@ -61,7 +61,7 @@ io.on('connection', function (socket) {
 		socket.name = data.name;
 		serverData.users.push(socket.name);
 		console.log(serverData.roomsInfo);
-		socket.emit('update_room_list', serverData.roomsInfo);
+		socket.emit('update_room_list', {rooms:serverData.roomsInfo});
 
 		socket.on('create_room', function (roomInfo) {
 			CreateRoom(roomInfo,socket);
