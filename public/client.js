@@ -4,10 +4,9 @@ socket.on('connect_success', function (data) {
     HideHeader();
     console.log("Connect Success!");
 
-    currentRoom = data;
+    currentRoom = data.room;
     console.log(currentRoom);
     queue = currentRoom.queue;
-    console.log(queue);
     if(queue.length>0){
         UpdateQueueElements();
     }
