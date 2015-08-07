@@ -5,10 +5,12 @@ socket.on('connect_success', function (data) {
     console.log("Connect Success!");
     console.log(data);
 
-    queue = data.room.queue;
+    currentRoom = JSON.parse(data.room);
+    
+    queue = currentRoom.queue;
     UpdateQueueElements();
 
-    if(data.room.isPlaying){
+    if(currentRoom.isPlaying){
         StartTrack(queue[0],data.pos);
     }
 

@@ -107,7 +107,7 @@ function OnJoinRoom(socket){
 
 	console.log(socket.name + " has joined a room!");
 
-	io.to(socket.id).emit('connect_success', {room: socket.room, pos: currentPosition});
+	io.to(socket.id).emit('connect_success', {room: JSON.stringify(socket.room), pos: currentPosition});
 
 	socket.on('add_to_queue', function (data) {
 		socket.room.queue.push(data.track);

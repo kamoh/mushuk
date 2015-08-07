@@ -1,6 +1,6 @@
 var moment = require('moment');
 
-function Room(name, id, description) {  
+function Room(name, id, description) { 
 	this.name = name;
 	this.id = id;
 	//this.owner = owner; //Might need this at some point. For non-spamming purposes.
