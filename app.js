@@ -28,7 +28,8 @@ app.get('/', function(req, res){
 //SOCKET STUFF////////////////////////////////
 var serverData = {
 	users: [],
-	rooms: []
+	rooms: [],
+	roomsInfo: []
 }
 
 var testRoom1 = {
@@ -59,8 +60,8 @@ io.on('connection', function (socket) {
 	socket.on('set_name', function (data) {
 		socket.name = data.name;
 		serverData.users.push(socket.name);
-		console.log(serverData.rooms);
-		socket.emit('update_room_list', {rooms:serverData.rooms});
+		console.log(serverData.roomsInfo);
+		socket.emit('update_room_list', {rooms:serverData.roomsInfo});
 
 		socket.on('create_room', function (roomInfo) {
 			CreateRoom(roomInfo,socket);
@@ -83,6 +84,7 @@ function CreateRoom(roomInfo,socket){
 	var id = uuid.v4();
     var room = new Room(roomInfo.name, id, roomInfo.description);
     serverData.rooms[id] = room;
+    serverData.roomsInfo[id] = {name: room.name, id: room.id, description: room.description};
     console.log(room);
     if(socket){
     	socket.room = name; //name the room
