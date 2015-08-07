@@ -82,7 +82,7 @@ io.on('connection', function (socket) {
 function CreateRoom(roomInfo,socket){
 	var id = uuid.v4();
     var room = new Room(roomInfo.name, id, roomInfo.description);
-    rooms[id] = room;
+    serverData.rooms[id] = room;
     if(socket){
     	socket.room = name; //name the room
 	    socket.join(socket.room); //auto-join the creator to the room
