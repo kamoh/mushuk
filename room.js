@@ -38,7 +38,7 @@ Room.prototype.OnSongEndOrSkip = function(){
 	this.queue.shift();
 	//io.sockets.in(this).emit('queue_update', { queue: this.queue });
 	if(this.queue.length>0){
-		StartSong();
+		this.StartSong();
 	}
 };
 
