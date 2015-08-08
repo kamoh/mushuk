@@ -50,10 +50,9 @@ Room.prototype.StartSong = function(){
 	var time = this.queue[0].duration;
 	time += 5000; // # Milisecond delay before starting a new song. (In case people are offset by a little)
 
-	this.songTimerInterval = setInterval(function(){
-		console.log("Song End!");
-		this.OnSongEndOrSkip();
-	},time);
+	this.songTimerInterval = setInterval((function(el) {
+		el.OnSongEndOrSkip();
+	})(this),time);
 	this.lastSongStartTime = moment();
 };
 
