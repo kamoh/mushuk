@@ -5,15 +5,17 @@ function IntervalController(room){
 }
 
 IntervalController.prototype.SetInterval = function(time){
-	this.intervalObject = setInterval(this.OnIntervalComplete,time);
+	this.intervalObject = setInterval(function(){
+		this.OnIntervalComplete(this);
+	},time);
 }
 
 IntervalController.prototype.ClearInterval = function(){
 	clearInterval(this.intervalObject);
 }
 
-IntervalController.prototype.OnIntervalComplete = function(){
-	this.room.OnSongEndOrSkip();
+IntervalController.prototype.OnIntervalComplete = function(room){
+	room.OnSongEndOrSkip();
 }
 
 module.exports = IntervalController;
