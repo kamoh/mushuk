@@ -123,6 +123,7 @@ function OnJoinRoom(socket, id){
 	});
 
 	socket.on('request_next_track', function () {
+		console.log("Queue before: " + room.queue);
 		room.OnSongEndOrSkip();
 		io.sockets.in(socket.room).emit('queue_update', { queue: room.queue });
 	});

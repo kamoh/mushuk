@@ -35,7 +35,9 @@ Room.prototype.OnSongEndOrSkip = function(){
 	this.isPlaying = false;
 	clearInterval(this.songTimerInterval);
 
+	console.log("Queue During: " + this.queue);
 	this.queue.shift();
+
 	//io.sockets.in(this).emit('queue_update', { queue: this.queue });
 	if(this.queue.length>0){
 		this.StartSong();
