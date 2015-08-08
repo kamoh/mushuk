@@ -87,7 +87,7 @@ function CreateRoom(roomInfo,socket){
 
     room.eventEmitter.on('start_track', function(time){
     	StartTrack(room);
-    	room.songTimerInterval = setInterval( room.OnSongEndOrSkip, time)
+    	room.songTimerInterval = setInterval( function(){room.OnSongEndOrSkip();}, time);
 	});
 
     room.eventEmitter.on('clear_interval', function(){
