@@ -1,4 +1,6 @@
-var moment = require('moment');
+var moment = require('moment'),
+	IntervalController = require('./intervalController.js'),
+	events = require('events');
 
 function Room(name, id, description) { 
 	this.name = name;
@@ -9,8 +11,10 @@ function Room(name, id, description) {
 	this.users = [];
 	this.queue = [];
 	this.isPlaying = false;
-	this.songTimerInterval = null;
-	this.lastSongStartTime = null;
+	this.songTimerInterval = new IntervalController(this);
+	this.lastSongStartTime = -1;
+
+	this.eventEmitter = new events.EventEmitter();
 };
 
 Room.prototype.GetData = function() {
@@ -32,13 +36,12 @@ Room.prototype.AddPerson = function(personID) {
 };
 
 Room.prototype.OnSongEndOrSkip = function(){
+	this.songTimerInterval.ClearInterval();
 	this.isPlaying = false;
 
 	console.log("Queue During: " + this.queue);
 	this.queue.shift();
 
-	clearInterval(this.songTimerInterval);
-	//io.sockets.in(this).emit('queue_update', { queue: this.queue });
 	if(this.queue.length>0){
 		this.StartSong();
 	}
@@ -49,7 +52,9 @@ Room.prototype.StartSong = function(){
 	var time = this.queue[0].duration;
 	time += 5000; // # Milisecond delay before starting a new song. (In case people are offset by a little)
 
-	this.songTimerInterval = setInterval(this.OnSongEndOrSkip,time);
+	this.eventEmitter.emit('start_song');
+
+	this.songTimerInterval.SetInterval(time);
 	this.lastSongStartTime = moment();
 };
 

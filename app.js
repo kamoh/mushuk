@@ -84,6 +84,9 @@ io.on('connection', function (socket) {
 function CreateRoom(roomInfo,socket){
 	var id = uuid.v4();
     var room = new Room(roomInfo.name, id, roomInfo.description,io);
+    room.eventEmitter.on('start_track', function(){
+    	StartTrack(room);
+	});
     serverData.rooms[id] = room;
     serverData.roomsInfo.push({name: room.name, id: room.id, description: room.description});
     console.log(room);
@@ -125,8 +128,6 @@ function OnJoinRoom(socket, id){
 	socket.on('request_next_track', function () {
 		console.log("Queue before: " + room.queue);
 		room.OnSongEndOrSkip();
-		io.sockets.in(socket.room).emit('queue_update', { queue: room.queue });
-		io.sockets.in(socket.room).emit('start_next_song');
 	});
 
 	socket.on('disconnect', function (){
@@ -134,6 +135,11 @@ function OnJoinRoom(socket, id){
 		UserLeft(socket.id);
 		io.sockets.in(socket.room).emit('user_left', {name:socket.name, list: room.users});
 	});
+}
+
+function StartTrack(room){
+	io.sockets.in(room.name).emit('queue_update', { queue: room.queue });
+	io.sockets.in(room.name).emit('start_next_song');
 }
 
 function UserLeft(id){
