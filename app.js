@@ -126,6 +126,7 @@ function OnJoinRoom(socket, id){
 		console.log("Queue before: " + room.queue);
 		room.OnSongEndOrSkip();
 		io.sockets.in(socket.room).emit('queue_update', { queue: room.queue });
+		io.sockets.in(socket.room).emit('start_next_song');
 	});
 
 	socket.on('disconnect', function (){
