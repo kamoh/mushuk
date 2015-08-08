@@ -15,3 +15,5 @@ IntervalController.prototype.ClearInterval = function(){
 IntervalController.prototype.OnIntervalComplete = function(){
 	this.room.OnSongEndOrSkip();
 }
+
+module.exports = IntervalController;
