@@ -6,7 +6,7 @@ function IntervalController(room){
 
 IntervalController.prototype.SetInterval = function(time){
 	this.intervalObject = setInterval(function(){
-		this.OnIntervalComplete(this);
+		this.OnIntervalComplete(this.room);
 	},time);
 }
 

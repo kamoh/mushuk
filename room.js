@@ -11,7 +11,7 @@ function Room(name, id, description) {
 	this.users = [];
 	this.queue = [];
 	this.isPlaying = false;
-	this.songTimerInterval = new IntervalController(this);
+	this.songTimerInterval = null;
 	this.lastSongStartTime = -1;
 
 	this.eventEmitter = new events.EventEmitter();
@@ -36,7 +36,7 @@ Room.prototype.AddPerson = function(personID) {
 };
 
 Room.prototype.OnSongEndOrSkip = function(){
-	this.songTimerInterval.ClearInterval();
+	this.eventEmitter.emit('clear_interval');
 	this.isPlaying = false;
 
 	console.log("Queue During: " + this.queue);
@@ -52,9 +52,8 @@ Room.prototype.StartSong = function(){
 	var time = this.queue[0].duration;
 	time += 5000; // # Milisecond delay before starting a new song. (In case people are offset by a little)
 
-	this.eventEmitter.emit('start_song');
+	this.eventEmitter.emit('start_song',time);
 
-	this.songTimerInterval.SetInterval(time);
 	this.lastSongStartTime = moment();
 };
 

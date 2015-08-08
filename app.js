@@ -84,9 +84,16 @@ io.on('connection', function (socket) {
 function CreateRoom(roomInfo,socket){
 	var id = uuid.v4();
     var room = new Room(roomInfo.name, id, roomInfo.description,io);
-    room.eventEmitter.on('start_track', function(){
+
+    room.eventEmitter.on('start_track', function(time){
     	StartTrack(room);
+    	room.songTimerInterval = setInterval( room.OnSongEndOrSkip, time)
 	});
+
+    room.eventEmitter.on('clear_interval', function(){
+    	clearInterval(room.songTimerInterval);
+    });
+
     serverData.rooms[id] = room;
     serverData.roomsInfo.push({name: room.name, id: room.id, description: room.description});
     console.log(room);
