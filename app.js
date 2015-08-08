@@ -128,7 +128,6 @@ function OnJoinRoom(socket, id){
 		io.sockets.in(socket.room).emit('queue_update', { queue: room.queue });
 		if(room.queue.length==1){
 			room.StartSong();
-			io.sockets.in(socket.room).emit('start_next_song');
 		}
 	});
 

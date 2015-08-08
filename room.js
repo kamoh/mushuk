@@ -52,7 +52,7 @@ Room.prototype.StartSong = function(){
 	var time = this.queue[0].duration;
 	time += 5000; // # Milisecond delay before starting a new song. (In case people are offset by a little)
 
-	this.eventEmitter.emit('start_song',time);
+	this.eventEmitter.emit('start_track',time);
 
 	this.lastSongStartTime = moment();
 };
