@@ -32,7 +32,6 @@ Room.prototype.AddPerson = function(personID) {
 };
 
 Room.prototype.OnSongEndOrSkip = function(){
-	console.log("====\n\n");
 	this.isPlaying = false;
 
 	console.log("Queue During: " + this.queue);
@@ -50,9 +49,7 @@ Room.prototype.StartSong = function(){
 	var time = this.queue[0].duration;
 	time += 5000; // # Milisecond delay before starting a new song. (In case people are offset by a little)
 
-	this.songTimerInterval = setInterval((function(el) {
-		el.OnSongEndOrSkip();
-	})(this),time);
+	this.songTimerInterval = setInterval(this.OnSongEndOrSkip,time);
 	this.lastSongStartTime = moment();
 };
 
