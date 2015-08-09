@@ -157,12 +157,12 @@
             }
 
             function ValidateRoomCreate(){
-                // if(!$("#room_name_input").value){
+                // if(!($("#room_name_input").val){
                 //     CreateAlert("<strong>Woah!</strong> Easy there pal! You need to enter a room name first!");
                 //     return;
                 // }
-                // if(!$("#room_desc_input").value){
-                //     reateAlert("<strong>Hold on!</strong> Make sure to add a room description.");
+                // if(!($("#room_desc_input").val){
+                //     CreateAlert("<strong>Hold on!</strong> Make sure to add a room description.");
                 //     return;
                 // }
                 CreateRoom();
@@ -170,7 +170,7 @@
 
             function CreateAlert(text){
                 var alert = $('<div></div>')
-                .appendTo$(document)
+                .appendTo($(document)
                 .attr('class', "alert alert-danger");
 
                 var exit = $('<a></a>')
