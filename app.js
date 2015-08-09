@@ -52,6 +52,7 @@ CreateRoom (testRoom2);
 CreateRoom (testRoom3);
 
 io.on('connection', function (socket) {
+	console.log("Connection!");
 	socket.on('set_name', function (data) {
 
 		socket.name = data.name;
