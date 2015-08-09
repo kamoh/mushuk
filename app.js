@@ -83,7 +83,7 @@ io.on('connection', function (socket) {
 
 function CreateRoom(roomInfo,socket){
 	var id = uuid.v4();
-    var room = new Room(roomInfo.name, id, roomInfo.description,io);
+    var room = new Room(roomInfo.name, id, roomInfo.description);
 
     room.eventEmitter.on('start_track', function(time){
     	StartTrack(room);

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>Mushuk: Uzbek for Cat</title>
@@ -12,12 +13,13 @@
             }
 
             .room-list {
-                /*text-align: center;*/
-                overflow-y: auto;
                 margin: auto;
-                height: 50%;
+                height: 40%;
             }
 
+            .hide-overflow{
+                overflow-y: auto;
+            }
 
             .vertical-center {
                 position: relative;
@@ -94,6 +96,7 @@
 
             $(document).ready(function(){
                 $("#room_group").hide();
+                $("#room_create_group").hide();
                 var bkgrs =[
                     "background1.jpg",
                     "background2.png",
@@ -127,6 +130,58 @@
                     RenderRoomObject(rooms[i]);
                 };
                 $("#room_group").fadeIn(750);
+
+                $("#goto_create_button").click(function(){
+                    $( "#room_group" ).fadeOut(750, function (){
+                        ShowCreateRoom();
+                    });
+
+                });
+            }
+
+            function ShowCreateRoom(){
+                $("#room_create_group").fadeIn (750);
+
+                $("#room_create_button").click(function(){
+                    ValidateRoomCreate();
+                });
+
+                $( "#room_name_input" ).keydown(RoomTextKeydown);
+                $( "#room_desc_input" ).keydown(RoomTextKeydown);
+            }
+
+            function RoomTextKeydown(e){
+                if(e.keyCode == 13){
+                    ValidateRoomCreate();                    
+                }
+            }
+
+            function ValidateRoomCreate(){
+                if(!$("#room_name_input").value){
+                    CreateAlert("<strong>Woah!</strong> Easy there pal! You need to enter a room name first!");
+                    return;
+                }
+                if(!$("#room_desc_input").value){
+                    reateAlert("<strong>Hold on!</strong> Make sure to add a room description.");
+                    return;
+                }
+                CreateRoom();
+            }
+
+            function CreateAlert(text){
+                var alert = $('<div></div>')
+                .appendTo$(document)
+                .attr('class', "alert alert-danger");
+
+                var exit = $('<a></a>')
+                .attr('href',"#")
+                .attr('class',"close")
+                .attr('data-dismiss',"alert")
+                .attr('aria-label',"close")
+                .text('&times;')
+
+                alert.append(exit);
+                alert.apend(text);
             }
 
             function RenderRoomObject(room){
@@ -149,7 +204,7 @@
             }
 
             function CreateRoom(){
-                socket.emit('create_room', { name: $('#room_name_input').val() });
+                socket.emit('create_room', { name: $('#room_name_input').val(), description: $('#room_desc_input').val()});
             }
 
             function JoinRoom(id){
@@ -171,18 +226,31 @@
         <div id="overlay" class="overlay">
             <div id="join-elements" class="vertical-center container">
                 <div id="name_input_group" class="center">
-                    <h1 class="light-text header-text">Enter a name, motherfucker:</h1>
+                    <h1 class="light-text header-text">What's ya name, fool?</h1>
                     <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1">I am known as: </span>
-                        <input id="name_input" type="text" class="form-control" placeholder="Motherfucker" aria-describedby="basic-addon1">
+                        <span class="input-group-addon" id="basic-addon1">I am known as:</span>
+                        <input id="name_input" type="text" class="form-control" placeholder="Some Person" aria-describedby="basic-addon1">
                     </div>
                 </div>
                 <div id="room_group" class="center">
-                    <h1 class="light-text">Choose a room:</h1>
-                    <div id="room_list_container" class="container">
-                        <div id="room_list" class="col-md-9">
+                    <h1 class="light-text header-text">Choose a room:</h1>
+                    <div id="room_list_container">
+                        <div id="room_list" class="col-md-9 list-group hide-overflow room-list">
                         </div>
                     </div>
+                    <button id="goto_create_button" type="button" class="btn btn-default">Or Create a Room!</button>
+                </div>
+                <div id="room_create_group" class="center">
+                    <h1 class="light-text header-text">Enter a room name and description:</h1>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Name:       </span>
+                        <input id="room_name_input" type="text" class="form-control" placeholder="Room Name" aria-describedby="basic-addon1">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon2">Description:</span>
+                        <input id="room_desc_input" type="text" class="form-control" placeholder="Room Description" aria-describedby="basic-addon2">
+                    </div>
+                    <button id="room_create_button" type="button" class="btn btn-default">Go for it!</button>
                 </div>
             </div>
             <div class="header">
