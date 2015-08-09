@@ -99,9 +99,9 @@ function CreateRoom(roomInfo,socket){
     console.log(room);
     if(socket){
     	socket.room = roomInfo.name; //name the room
-	    socket.join(socket.room,id); //auto-join the creator to the room
+	    socket.join(socket.room); //auto-join the creator to the room
 	    room.AddPerson(socket.id); //also add the person to the room object
-	    OnJoinRoom(socket);
+	    OnJoinRoom(socket,id);
     }
 }
 
