@@ -11,7 +11,10 @@ var express = require('express')
 
 var http = require("http");
 setInterval(function() {
-    http.get("http://mushuk-dev.herokuapp.com");
+    // For production
+    // http.get("http://mushuk-dev.herokuapp.com");
+    // For testing
+    http.get("localhost:5000");
 }, 600000);
 
 app.use(express.static(__dirname + '/public'));
@@ -56,6 +59,12 @@ io.on('connection', function (socket) {
 		console.log(socket.name + ' disconnected!');
 	});
 
+	// Send chat message
+	socket.on('chat message', function(msg){
+    io.emit('chat message', msg);
+    console.log('message: ' + msg);
+  });
+
 	socket.on('set_name', function (data) {
 		socket.name = data.name;
 		serverData.users.push(socket.name);
@@ -76,7 +85,7 @@ io.on('connection', function (socket) {
 		});
 
 	});
-	
+
 });
 
 function CreateRoom(roomInfo,socket){
@@ -133,3 +142,55 @@ function UserLeft(name){
     console.log('New Client List: ' + this.users);
 }
 //////////////////////////////////////////////
+
+// Update client-side user list
+
+function updateClientUserList(clientList){
+  io.sockets.emit('sync user list', clientList);
+  console.log('current users: ' + clientList.toString());
+}
+
+function OnSongEndOrSkip(){
+	roomData.isPlaying = false;
+	clearInterval(songTimerInterval);
+
+	roomData.queue.shift();
+	io.emit('queue_update', { queue: roomData.queue });
+	if(roomData.queue.length>0){
+		StartSong();
+	}
+}
+
+function StartSong(){
+	roomData.isPlaying = true;
+	var time = roomData.queue[0].duration;
+	time += 5000; // # Milisecond delay before starting a new song. (In case people are offset by a little)
+
+	songTimerInterval = setInterval(OnSongEndOrSkip,time);
+	lastSongStartTime = moment();
+
+	io.emit('start_next_song');
+}
+
+function userLeft(name) {
+  for (var i = 0; i < roomData.users.length; i++) {
+    if (name === roomData.users[i]) {
+      console.log("Removing: " + name);
+      roomData.users.splice(i, 1);
+    };
+  }
+
+  var leftMsg = userLeftMessage();
+
+  io.emit('user_left', {name:name, list: roomData.users, msg: leftMsg})
+  console.log('New Client List: ' + roomData.users);
+  io.emit('update_user_list', roomData.users);
+};
+
+function userLeftMessage() {
+  var leftMessages = ['ran out screaming','exploded nicely','evaporated into sierra mist','left to go poop','peaced out','was terminated','kicked the computer and it burst into flames and is now gone forever','went to eat five burritos','went to walk the parrot','left to buy a shoe','left like a doophead','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room'],
+    leftMsg = leftMessages[Math.floor(Math.random() * leftMessages.length)];
+
+  console.log("msg is "+leftMsg);
+  return leftMsg;
+};
