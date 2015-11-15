@@ -10,7 +10,10 @@ var moment = require('moment');
 
 var http = require("http");
 setInterval(function() {
+    // For production
     http.get("http://mushuk-dev.herokuapp.com");
+    // For testing
+    // http.get("localhost:5000");
 }, 600000);
 
 app.use(express.static(__dirname + '/public'));
@@ -43,6 +46,12 @@ io.on('connection', function (socket) {
 	}
 	io.to(socket.id).emit('connect_success', {room: roomData, pos: currentPosition});
 
+	// Send chat message
+	socket.on('chat message', function(msg){
+    io.emit('chat message', msg);
+    console.log('message: ' + msg);
+  });
+
 	socket.on('set_name', function (data) {
 		socket.name = data.name;
 		roomData.users.push(socket.name);
@@ -69,6 +78,13 @@ io.on('connection', function (socket) {
 	});
 });
 
+// Update client-side user list
+
+function updateClientUserList(clientList){
+  io.sockets.emit('sync user list', clientList);
+  console.log('current users: ' + clientList.toString());
+}
+
 function OnSongEndOrSkip(){
 	roomData.isPlaying = false;
 	clearInterval(songTimerInterval);
@@ -92,13 +108,24 @@ function StartSong(){
 }
 
 function userLeft(name) {
-    for (var i = 0; i < roomData.users.length; i++) {
-      if (name === roomData.users[i]) {
-        console.log("Removing: " + name);
-        roomData.users.splice(i, 1);
-      };
-    }
+  for (var i = 0; i < roomData.users.length; i++) {
+    if (name === roomData.users[i]) {
+      console.log("Removing: " + name);
+      roomData.users.splice(i, 1);
+    };
+  }
 
-   	io.emit('user_left', {name:name, list: roomData.users})
-    console.log('New Client List: ' + roomData.users);
- };
+  var leftMsg = userLeftMessage();
+
+  io.emit('user_left', {name:name, list: roomData.users, msg: leftMsg})
+  console.log('New Client List: ' + roomData.users);
+  io.emit('update_user_list', roomData.users);
+};
+
+function userLeftMessage() {
+  var leftMessages = ['ran out screaming','exploded nicely','evaporated into sierra mist','left to go poop','peaced out','was terminated','kicked the computer and it burst into flames and is now gone forever','went to eat five burritos','went to walk the parrot','left to buy a shoe','left like a doophead','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room','left the room'],
+    leftMsg = leftMessages[Math.floor(Math.random() * leftMessages.length)];
+
+  console.log("msg is "+leftMsg);
+  return leftMsg;
+};

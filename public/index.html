@@ -11,7 +11,7 @@
                 padding: 10px;
             }
 
-            .fill { 
+            .fill {
                 /*min-height: 100%;
                 height: 100%;*/
             }
@@ -46,6 +46,40 @@
                 height: 50px;
                 border: 2px solid grey;
             }
+
+            /* Begin copypasta from chat app */
+
+            #messages {
+              background: white;
+              list-style-type: none;
+              margin: 0;
+              padding: 0;
+              width: 80%;
+              overflow: scroll;
+              height: 400px;
+            }
+            #messages li {
+              padding: 5px 10px;
+            }
+            #messages li.italic{
+              font-style: italic;
+            }
+            #messages li:nth-child(odd) {
+              background: #eee;
+            }
+            #roll-call {
+              background: white;
+              float: right;
+              width: 19%;
+              height: 300px;
+              overflow: scroll;
+              border: 2px #EEE solid;
+              margin-right: 6px;
+              padding: 6px;
+            }
+
+            /* End copypasta from chat app */
+
         </style>
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -55,7 +89,10 @@
         <script type="text/javascript">
 
             //Socket Stuff/////////////////////////////////////////////////
+            // For production
             var socket = io.connect('http://mushuk-dev.herokuapp.com'),
+            // For testing
+            // var socket = io.connect('localhost:5000'),
             noNames = ["goober","monkeybat","moosejamms","grumpkin","derf-pooper","roosta","sounddrooper","tacobreath","lolwut","uncle jemima","front-door farter","carseat","air conditioner","lint roller","butterscotch krumpet","tuba repairman","pocket salesman","car door inspector","used gum aficionado","k-pop fanatic","beer ombudsman","big bird impersonator","graffiti stain","wisdom tooth","ignorance tooth","pocket harmonica", "dumb butt"],
             defaultName = noNames[Math.floor(Math.random() * noNames.length)] + Math.floor(Math.random(1,9999)*1000);
 
@@ -76,13 +113,29 @@
                 // }
                 socket.emit('set_name', { name: defaultName });
 
+                console.log('roomdata ' + data.room.users);
+
                 socket.on('user_left', function (data) {
-                    console.log(data.name + " left!");
+                  console.log(data.name + " left!");
+                  appendMessage("li class='italic'", data.name + " " + data.msg);
+                  updateClientUserList(data.list);
                 });
 
                 socket.on('user_joined', function (data) {
-                    console.log(data.name + " joined!");
+                  console.log(data.name + " joined!");
+                  appendMessage("li class='italic'", data.name + " entered the room");
+                  updateClientUserList(data.list);
                 });
+
+                function updateClientUserList(clientList){
+                  console.log('currnet users: ' + clientList.toString());
+                  var $lis = $("#roll-call");
+                  $lis.empty();
+                  $lis.append("Roll Call");
+                  for(var i = 0; i < clientList.length; i++) {
+                    $lis.append('<li>' + clientList[i] + '</li/>');
+                  }
+                };
 
                 socket.on('queue_update', function (data) {
                     queue = data.queue;
@@ -92,7 +145,75 @@
                 socket.on('start_next_song', function () {
                     StartTrack(queue[0],0);
                 });
+
+                // Upon user's initial sign-on:
+
+                socket.emit('sign on', defaultName);
+
+                // Update user list using the server's user list
+
+                socket.on('sync user list', function(nameListFromServer){
+                  console.log('in sync user list');
+                  var $lis = $("#roll-call");
+                  $lis.empty();
+                  $lis.append("Roll Call");
+                  for(var i = 0; i < nameListFromServer.length; i++) {
+                    $lis.append('<li>' + nameListFromServer[i] + '</li/>');
+                  }
+                });
+
+                // Form submission handler
+
+                $('form').submit(function(){
+                  var msg = $('#m').val(),
+                      newName = $('#name').val();
+                  if (msg.length > 0) {
+                    submitMessageToServer(msg, newName);
+                  } else if (newName.length > 0) {
+                    submitNameChangeToServer(defaultName, newName);
+                    defaultName = newName;
+                  } else {};
+
+                  return false;
+
+                });
             });
+
+            // BEGIN COPYPASTA FROM CHAT APP
+
+            socket.on('someone name changed', function(oldName, newName){
+              appendMessage("li class='italic'", oldName + ' is now known as ' + newName);
+            })
+
+            function submitMessageToServer(msg, newName) {
+              socket.emit('chat message', defaultName + ': ' + msg);
+              console.log("emitted message '" + msg + "'");
+              $('#m').val('');
+            }
+
+            // Emitter for sending chat messages
+
+            socket.on('chat message', function(msg){
+              console.log("received message " + msg + "'");
+              appendMessage('li', msg);
+            });
+
+            // Add messages to the chat
+
+            function appendMessage(li_style, msg){
+              $('#messages').append($('<' + li_style + '>').text(msg));
+              document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+            };
+
+            // When a user leaves the chat
+
+            socket.on('user left', function(args) {
+              appendMessage("li class='italic'", args[0] + " " + args[1]);
+              console.log(args[0] + ' has exeunt');
+            });
+
+            // END COPYPASTA FROM CHAT APP
+
             ///////////////////////////////////////////////////////////////
 
             var cid     = '9896695e978359ad6e39e1b98f22abb4';
@@ -322,13 +443,27 @@
         </div>
         <hr/>
 
+        <!-- BEGIN CHAT COPYPASTA -->
+        <div class="container">
+          <div>
+            <div id="roll-call">Roll Call</div>
+          </div>
+          <ul id="messages"></ul>
+          <form action="" class="">
+            <input id="m" autocomplete="off"><button>Send</button>
+            <!-- Use this optional field to change names - not hooked up atm though. -->
+            <!-- <input id="name" autocomplete="off" placeholder="your name"> -->
+          </form>
+        </div>
+        <!-- END CHAT COPYPASTA -->
+
         <div class="container">
             <h3 class="header-text" style="color: lightgrey">Search</h3>
             <input type="text" name="search" id="search"/>
             <button onclick="Search()">Find Song!</button>
             <hr/>
             <div id="search_results" class="container">
-                
+
             </div>
         </div>
         <a class="footer-link" href="http://www.soundcloud.com"><img src="https://developers.soundcloud.com/assets/powered_by_white-371bd6967352fcc89673d4c81f7e5661.png"/></a>
