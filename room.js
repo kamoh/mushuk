@@ -2,7 +2,7 @@ var moment = require('moment'),
 	IntervalController = require('./intervalController.js'),
 	events = require('events');
 
-function Room(name, id, description) { 
+function Room(name, id, description) {
 	this.name = name;
 	this.id = id;
 	//this.owner = owner; //Might need this at some point. For non-spamming purposes.
@@ -28,7 +28,7 @@ Room.prototype.GetData = function() {
 	}
 }
 
-Room.prototype.AddPerson = function(personID) {  
+Room.prototype.AddPerson = function(personID) {
 	if (this.status === "available") {
 		this.users.push(personID);
 		console.log(this.users);
@@ -64,4 +64,4 @@ Room.prototype.UserLeft = function(id) {
 	this.users.splice(personIndex, 1);
 };
 
-module.exports = Room; 
+module.exports = Room;

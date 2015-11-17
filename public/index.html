@@ -32,7 +32,7 @@
                 transform: translateY(-100%);
             }
 
-            .fill { 
+            .fill {
                 /*min-height: 100%;
                 height: 100%;*/
             }
@@ -68,7 +68,7 @@
                 height: 50px;
                 border: 2px solid grey;
             }
-            .overlay {  
+            .overlay {
                 position:absolute;
                 top:0;
                 left:0;
@@ -89,6 +89,40 @@
             .light-text{
                 color: lightgrey;
             }
+
+            /* Begin copypasta from chat app */
+
+            #messages {
+              background: white;
+              list-style-type: none;
+              margin: 0;
+              padding: 0;
+              width: 80%;
+              overflow: scroll;
+              height: 400px;
+            }
+            #messages li {
+              padding: 5px 10px;
+            }
+            #messages li.italic{
+              font-style: italic;
+            }
+            #messages li:nth-child(odd) {
+              background: #eee;
+            }
+            #roll-call {
+              background: white;
+              float: right;
+              width: 19%;
+              height: 300px;
+              overflow: scroll;
+              border: 2px #EEE solid;
+              margin-right: 6px;
+              padding: 6px;
+            }
+
+            /* End copypasta from chat app */
+
         </style>
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -158,7 +192,7 @@
 
             function RoomTextKeydown(e){
                 if(e.keyCode == 13){
-                    ValidateRoomCreate();                    
+                    ValidateRoomCreate();
                 }
             }
 
@@ -295,13 +329,27 @@
         </div>
         <hr/>
 
+        <!-- BEGIN CHAT COPYPASTA -->
+        <div class="container">
+          <div>
+            <div id="roll-call">Roll Call</div>
+          </div>
+          <ul id="messages"></ul>
+          <form action="" class="">
+            <input id="m" autocomplete="off"><button>Send</button>
+            <!-- Use this optional field to change names - not hooked up atm though. -Ben -->
+            <!-- <input id="name" autocomplete="off" placeholder="your name"> -->
+          </form>
+        </div>
+        <!-- END CHAT COPYPASTA -->
+
         <div class="container">
             <h3 class="header-text" style="color: lightgrey">Search</h3>
             <input type="text" name="search" id="search"/>
             <button onclick="Search()">Find Song!</button>
             <hr/>
             <div id="search_results" class="container">
-                
+
             </div>
         </div>
         <a class="footer-link" href="http://www.soundcloud.com"><img src="https://developers.soundcloud.com/assets/powered_by_white-371bd6967352fcc89673d4c81f7e5661.png"/></a>

@@ -11,7 +11,10 @@ var express = require('express')
 
 var http = require("http");
 setInterval(function() {
-    http.get("http://mushuk-dev.herokuapp.com");
+    // Testing
+    http.get("localhost:5000");
+    // Production
+    // http.get("http://mushuk-dev.herokuapp.com");
 }, 600000);
 
 app.use(express.static(__dirname + '/public'));
@@ -79,7 +82,7 @@ io.on('connection', function (socket) {
 		});
 
 	});
-	
+
 });
 
 function CreateRoom(roomInfo,socket){
@@ -97,7 +100,7 @@ function CreateRoom(roomInfo,socket){
 
     serverData.rooms[id] = room;
     serverData.roomsInfo.push({name: room.name, id: room.id, description: room.description});
-    console.log(room);
+    console.log("room data: " + room);
     if(socket){
     	socket.room = roomInfo.name; //name the room
 	    socket.join(socket.room); //auto-join the creator to the room
@@ -131,6 +134,13 @@ function OnJoinRoom(socket, id){
 			room.StartSong();
 		}
 	});
+
+  // Send chat message
+  socket.on('chat message', function(msg){
+    console.log('In server side chat message socket event');
+    io.emit('chat message', msg);
+    console.log('message: ' + msg);
+  });
 
 	socket.on('request_next_track', function () {
 		console.log("Queue before: " + room.queue);

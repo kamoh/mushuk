@@ -1,4 +1,7 @@
-var socket = io.connect('http://mushuk-dev.herokuapp.com');
+// Production
+// var socket = io.connect('http://mushuk-dev.herokuapp.com');
+// Testing
+var socket = io.connect('localhost:5000');
 
 socket.on('connect_success', function (data) {
     HideHeader();
@@ -14,6 +17,25 @@ socket.on('connect_success', function (data) {
     if(currentRoom.isPlaying){
         StartTrack(queue[0],data.pos);
     }
+
+    // Form submission handler for chat
+
+    $('form').submit(function(){
+      var msg = $('#m').val();
+      if (msg.length > 0) {
+        submitMessageToServer(msg);
+      } else {};
+
+      return false;
+
+    });
+
+    // Emitter for sending chat messages
+
+    socket.on('chat message', function(msg){
+      console.log("received message " + msg + "'");
+      appendMessage('li', msg);
+    });
 
     socket.on('user_left', function (data) {
         console.log(data.name + " left!");
@@ -32,6 +54,21 @@ socket.on('connect_success', function (data) {
         StartTrack(queue[0],0);
     });
 });
+
+function submitMessageToServer(msg, name) {
+  socket.emit('chat message', name + ': ' + msg);
+  console.log("IN submitMessageToServer");
+  console.log("emitted message '" + msg + "'");
+  console.log("emitted name " + name);
+  $('#m').val('');
+}
+
+// Add messages to the chat
+
+function appendMessage(li_style, msg){
+  $('#messages').append($('<' + li_style + '>').text(msg));
+  document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+};
 
 function StartTrack(track,pos){
     soundManager.stop('currentSound');
