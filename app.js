@@ -12,9 +12,9 @@ var express = require('express')
 var http = require("http");
 setInterval(function() {
     // Testing
-    http.get("localhost:5000");
+    //http.get("localhost:5000");
     // Production
-    // http.get("http://mushuk-dev.herokuapp.com");
+    http.get("http://mushuk-dev.herokuapp.com");
 }, 600000);
 
 app.use(express.static(__dirname + '/public'));
