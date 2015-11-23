@@ -135,12 +135,12 @@ function OnJoinRoom(socket, id){
 		}
 	});
 
-  // Send chat message
-  socket.on('chat message', function(msg){
-    console.log('In server side chat message socket event');
-    io.emit('chat message', msg);
-    console.log('message: ' + msg);
-  });
+	  // Send chat message
+	  socket.on('chat message', function(msg){
+	    console.log('In server side chat message socket event');
+	    io.sockets.in(socket.room).emit('chat message', msg);
+	    console.log('message: ' + msg);
+	  });
 
 	socket.on('request_next_track', function () {
 		console.log("Queue before: " + room.queue);
