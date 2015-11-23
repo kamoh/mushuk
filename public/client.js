@@ -1,7 +1,7 @@
 // Production
-// var socket = io.connect('http://mushuk-dev.herokuapp.com');
+var socket = io.connect('http://mushuk-dev.herokuapp.com');
 // Testing
-var socket = io.connect('localhost:5000');
+//var socket = io.connect('localhost:5000');
 
 socket.on('connect_success', function (data) {
     HideHeader();
