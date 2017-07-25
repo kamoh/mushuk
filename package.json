@@ -2,6 +2,9 @@
   "name": "mushuk",
   "version": "0.0.2",
   "description": "Uzbek for Cat",
+  "engines": {
+      "node": "6.11.1"
+    },
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
